@@ -44,26 +44,42 @@ const LeftSidebar = () => {
 
       {/* Navigation Links */}
       <div className="mt-6 space-y-4">
-        <Button variant="ghost" className="w-full flex justify-start space-x-3">
-          <Link to="/explore" className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          className="w-full flex justify-start space-x-3"
+          asChild
+        >
+          <Link to="/feeds" className="flex items-center gap-2">
             <HomeIcon className="w-5 h-5" />
             <Text>Feeds</Text>
           </Link>
         </Button>
-        <Button variant="ghost" className="w-full flex justify-start space-x-3">
+        <Button
+          variant="ghost"
+          className="w-full flex justify-start space-x-3"
+          asChild
+        >
           <Link to="/explore" className="flex items-center gap-2">
             <ChatBubbleIcon className="w-5 h-4.5" />
             <Text>Chats</Text>
           </Link>
         </Button>
-        <Button variant="ghost" className="w-full flex justify-start space-x-3">
+        <Button
+          variant="ghost"
+          className="w-full flex justify-start space-x-3"
+          asChild
+        >
           <Link to="/explore" className="flex items-center gap-2">
             <BellIcon className="w-5 h-5" />
             <Text>Notificaiton</Text>
           </Link>
         </Button>
-        <Button variant="ghost" className="w-full flex justify-start space-x-3">
-          <Link to="/explore" className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          className="w-full flex justify-start space-x-3"
+          asChild
+        >
+          <Link to="/feeds" className="flex items-center gap-2">
             <Cross2Icon className="w-5 h-5" />
             <Text>Logout</Text>
           </Link>
