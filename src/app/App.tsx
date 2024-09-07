@@ -1,11 +1,11 @@
-import { Button } from ".././components/shadcn-ui/button";
+import { Button } from "../shared/components/shadcn-ui/button";
 import React from "react";
+import AppRoutes from "./AppRoutes";
 
 const App = () => {
   return (
     <>
-      <h1 className="font-bold text-2xl underline text-red-700">Hello react</h1>
-      <Button>Click me</Button>
+      <AppRoutes />
     </>
   );
 };

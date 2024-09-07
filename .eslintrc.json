@@ -65,13 +65,15 @@
             "except": ["./b"]
           },
           // More restrcition files...
+
+          // disables more cross imports in src:
           {
             "target": "./src/features",
-            "from": "./src/(routes)"
+            "from": "./src/app"
           },
           {
-            "target":"./src/_shared",
-            "from": ["./src/features", "./src/(routes)"]
+            "target":"./src/shared",
+            "from": ["./src/features", "./src/app"]
           }
         ]
       }
