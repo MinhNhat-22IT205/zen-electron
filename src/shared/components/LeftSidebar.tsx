@@ -59,7 +59,7 @@ const LeftSidebar = () => {
           className="w-full flex justify-start space-x-3"
           asChild
         >
-          <Link to="/explore" className="flex items-center gap-2">
+          <Link to="/chats" className="flex items-center gap-2">
             <ChatBubbleIcon className="w-5 h-4.5" />
             <Text>Chats</Text>
           </Link>
@@ -69,7 +69,7 @@ const LeftSidebar = () => {
           className="w-full flex justify-start space-x-3"
           asChild
         >
-          <Link to="/explore" className="flex items-center gap-2">
+          <Link to="/notification" className="flex items-center gap-2">
             <BellIcon className="w-5 h-5" />
             <Text>Notificaiton</Text>
           </Link>
