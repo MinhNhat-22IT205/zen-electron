@@ -5,7 +5,7 @@ import ConversationList from "./conversation/ConversationList";
 
 const ChatPage = () => {
   return (
-    <div className="h-screen w-full flex flex-col bg-blue-50">
+    <div className="h-screen w-full flex flex-col ">
       <div className="border-b border-gray-200">
         <Button variant="link">
           <TriangleLeftIcon className="w-4 h-4" /> Back
@@ -16,6 +16,7 @@ const ChatPage = () => {
           <ConversationList />
         </div>
         <div className="h-full w-full">
+          {/* ChatRoom */}
           <Outlet />
         </div>
       </div>
