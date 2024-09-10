@@ -1,12 +1,5 @@
 import React from "react";
-import { Card, CardContent } from "../../../shared/components/shadcn-ui/card";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "../../../shared/components/shadcn-ui/avatar";
-import Text from "../../../shared/components/shadcn-ui/text";
-import { Button } from "../../../shared/components/shadcn-ui/button";
+
 import {
   BookmarkIcon,
   ChatBubbleIcon,
@@ -15,6 +8,14 @@ import {
   Share1Icon,
 } from "@radix-ui/react-icons";
 import FeedImages from "./FeedImages";
+import { Card, CardContent } from "@/src/shared/components/shadcn-ui/card";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/src/shared/components/shadcn-ui/avatar";
+import Text from "@/src/shared/components/shadcn-ui/text";
+import { Button } from "@/src/shared/components/shadcn-ui/button";
 
 const Feed = () => {
   return (
