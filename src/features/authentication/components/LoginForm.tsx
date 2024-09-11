@@ -10,7 +10,9 @@ const LoginForm = () => {
       <h1 className="font-bold text-2xl">Login</h1>
       <Input placeholder="Username" />
       <Input placeholder="Password" />
-      <Button variant={"default"}>Submit</Button>
+      <Button variant={"default"} onClick={() => navigate("/feeds")}>
+        Submit
+      </Button>
       <Button variant={"link"} onClick={() => navigate("/auth/register")}>
         Sign Up
       </Button>
