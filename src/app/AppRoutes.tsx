@@ -35,6 +35,7 @@ const AppRoutes = () => {
             <Route path="feeds" element={<FeedPageLayout />}>
               <Route index element={<FeedPage />} />
             </Route>
+            <Route path="users" element={<></>} />
           </Route>
 
           {/* Chat page */}

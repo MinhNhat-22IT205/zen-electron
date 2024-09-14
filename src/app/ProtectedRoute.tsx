@@ -1,8 +1,9 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { useAuthStore } from "../shared/libs/zustand/auth.zustand";
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const isLoggedIn = true;
+  const isLoggedIn = !!useAuthStore((state) => state.endUser);
 
   if (!isLoggedIn) {
     return <Navigate to="/auth" />;

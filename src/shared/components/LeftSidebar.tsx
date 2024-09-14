@@ -9,8 +9,10 @@ import {
   Cross2Icon,
   HomeIcon,
 } from "@radix-ui/react-icons";
+import { useAuthStore } from "../libs/zustand/auth.zustand";
 
 const LeftSidebar = () => {
+  const authStore = useAuthStore((state) => state);
   return (
     <div className="h-full w-72 p-4 shadow-xl">
       {/* User Profile */}
@@ -79,7 +81,11 @@ const LeftSidebar = () => {
           className="w-full flex justify-start space-x-3"
           asChild
         >
-          <Link to="/feeds" className="flex items-center gap-2">
+          <Link
+            to="/feeds"
+            className="flex items-center gap-2"
+            onClick={() => authStore.setEndUser(null)}
+          >
             <Cross2Icon className="w-5 h-5" />
             <Text>Logout</Text>
           </Link>
