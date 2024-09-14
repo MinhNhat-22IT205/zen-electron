@@ -1,5 +1,5 @@
 import http from "@/src/shared/libs/axios/axios.base";
-import { CONVERSTAION_API_ENDPOINT } from "./conversation-endpoints.api";
+import { CONVERSTAION_API_ENDPOINT } from "./chat-endpoints.api";
 import { Conversation } from "@/src/shared/types/conversation.type";
 import { ServerError } from "@/src/shared/types/error.type";
 

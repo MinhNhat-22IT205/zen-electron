@@ -22,10 +22,10 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
   return (
     <div
       className="p-2 w-full"
-      onClick={() => navigate("/conversations/" + otherEndUser._id)}
+      onClick={() => navigate("/conversations/" + conversation._id)}
     >
       <div
-        className={`hover:bg-gray-100 cursor-pointer flex items-center justify-start gap-2 w-full p-2 rounded-lg ${id == otherEndUser._id && "bg-gray-100"}`}
+        className={`hover:bg-gray-100 cursor-pointer flex items-center justify-start gap-2 w-full p-2 rounded-lg ${id == conversation._id && "bg-gray-100"}`}
       >
         <Avatar>
           <AvatarImage

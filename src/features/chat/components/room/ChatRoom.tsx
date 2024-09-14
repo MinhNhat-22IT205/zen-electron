@@ -11,40 +11,34 @@ import {
 } from "@radix-ui/react-icons";
 import React from "react";
 import MessageList from "./MessageList";
+import useSWR from "swr";
+import { CONVERSTAION_API_ENDPOINT } from "../../api/chat-endpoints.api";
+import { useParams } from "react-router-dom";
+import { fetcher } from "@/src/shared/libs/swr/fetcher";
+import { Conversation } from "@/src/shared/types/conversation.type";
+import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 
 const ChatRoom = () => {
+  const { id } = useParams();
+  const myEndUserId = useAuthStore((state) => state.endUser?._id);
+  const { data: conversation } = useSWR<Conversation>(
+    CONVERSTAION_API_ENDPOINT + "/" + id,
+    fetcher,
+  );
+  const otherEndUser = conversation?.endUserIds.find(
+    (endUser) => endUser._id !== myEndUserId,
+  );
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex justify-between items-center p-2 border-b">
-        <Text className="flex-1 font-bold"> Johnson </Text>
+        <Text className="flex-1 font-bold"> {otherEndUser?.username} </Text>
         <div className="flex items-center justify-between">
           <Button variant="ghost">Video</Button>
           <Button variant="ghost">Audio</Button>
         </div>
       </div>
-      {/* Chat Messages */}
-      <ScrollArea className="flex-1 h-full w-full">
-        <MessageList />
-      </ScrollArea>
-      {/* Chat Input */}
-      <div className="flex px-2">
-        <Input
-          className="focus:!outline-none focus-visible:!ring-0 flex-1"
-          type="text"
-          placeholder="Type a message"
-        />
-        <Button variant="ghost">
-          <PaperPlaneIcon className="w-4 h-4" />
-        </Button>
-      </div>
-      <div className="flex items-center py-2 px-4 gap-2">
-        <Button variant="ghost" className="!p-1 !h-5">
-          <ImageIcon className="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" className="!p-1 !h-5">
-          <Link2Icon className="w-4 h-4" />
-        </Button>
-      </div>
+      {/* Chat Messages & Message Input */}
+      <MessageList />
     </div>
   );
 };

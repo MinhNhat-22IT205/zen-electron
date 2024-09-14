@@ -3,7 +3,7 @@ import ConversationItem from "./ConversationItem";
 import { ScrollArea } from "../../../../shared/components/shadcn-ui/scroll-area";
 import useSWR from "swr";
 import { Conversation } from "@/src/shared/types/conversation.type";
-import { CONVERSTAION_API_ENDPOINT } from "../../api/conversation-endpoints.api";
+import { CONVERSTAION_API_ENDPOINT } from "../../api/chat-endpoints.api";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
 
 const ConversationList = () => {
