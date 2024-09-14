@@ -8,7 +8,7 @@ const ChatPage = () => {
   return (
     <div className="h-screen w-full flex flex-col ">
       <div className="border-b border-gray-200">
-        <Button variant="link" onClick={() => navigate(-1)}>
+        <Button variant="link" onClick={() => navigate("/feeds")}>
           <TriangleLeftIcon className="w-4 h-4" /> Back
         </Button>
       </div>

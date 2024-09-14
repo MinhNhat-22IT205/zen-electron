@@ -15,7 +15,8 @@ import {
   FormMessage,
 } from "@/src/shared/components/shadcn-ui/form";
 import { toast } from "@/src/shared/hooks/use-toast";
-import { register, ServerError } from "../api/auth.api";
+import { register } from "../api/auth.api";
+import { ServerError } from "@/src/shared/types/error.type";
 
 const RegisterForm = () => {
   const navigate = useNavigate();

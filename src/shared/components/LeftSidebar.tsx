@@ -23,7 +23,9 @@ const LeftSidebar = () => {
           alt="User profile"
         />
         <div>
-          <Heading className="text-center">Katia Zuora</Heading>
+          <Heading className="text-center">
+            {authStore.endUser.username}
+          </Heading>
           <Text className="text-gray-500">Tallahassee, Florida</Text>
         </div>
       </div>
@@ -61,7 +63,7 @@ const LeftSidebar = () => {
           className="w-full flex justify-start space-x-3"
           asChild
         >
-          <Link to="/chats" className="flex items-center gap-2">
+          <Link to="/conversations" className="flex items-center gap-2">
             <ChatBubbleIcon className="w-5 h-4.5" />
             <Text>Chats</Text>
           </Link>

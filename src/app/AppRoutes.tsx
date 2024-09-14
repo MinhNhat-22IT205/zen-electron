@@ -10,6 +10,7 @@ import RegisterForm from "../features/authentication/components/RegisterForm";
 import AuthLayout from "../features/authentication/components/AuthLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import SearchPage from "../features/search/components/SearchPage";
+import CreateConversation from "../features/chat/components/conversation/CreateConversation";
 
 const AppRoutes = () => {
   return (
@@ -41,13 +42,17 @@ const AppRoutes = () => {
 
           {/* Chat page */}
           <Route
-            path="/chats"
+            path="/conversations"
             element={
               <ProtectedRoute>
                 <ChatPage />
               </ProtectedRoute>
             }
           >
+            <Route
+              path="create-conversation"
+              element={<CreateConversation />}
+            />
             <Route path=":id" element={<ChatRoom />} />
           </Route>
         </Routes>

@@ -15,8 +15,9 @@ import {
 } from "@/src/shared/components/shadcn-ui/form";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useToast } from "@/src/shared/hooks/use-toast";
-import { login, ServerError } from "../api/auth.api";
+import { login } from "../api/auth.api";
 import { EndUser } from "@/src/shared/types/enduser.type";
+import { ServerError } from "@/src/shared/types/error.type";
 
 const LoginForm = () => {
   const navigate = useNavigate();

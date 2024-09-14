@@ -3,12 +3,9 @@ import { EndUser } from "@/src/shared/types/enduser.type";
 import { ztLoginInputs } from "../libs/zod/login.zod";
 import { LOGIN_API_ENDPOINT, REGISTER_API_ENDPOINT } from "./auth-endpoints.api";
 import { ztRegisterInputs } from "../libs/zod/register.zod";
+import { ServerError } from "@/src/shared/types/error.type";
 
- type ServerError={
-    message:string;
-    statusCode:number;
-    error:string
-}
+
 
 const login=async(values: ztLoginInputs):Promise<EndUser|ServerError> =>{
     try {
@@ -35,4 +32,4 @@ const register=async(values: ztRegisterInputs):Promise<EndUser|ServerError> =>{
         return error.response.data
     }
 }
-export { login,register, ServerError };
+export { login,register };

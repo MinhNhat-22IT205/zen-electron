@@ -8,6 +8,7 @@ import { Card } from "@/src/shared/components/shadcn-ui/card";
 import { EndUser } from "@/src/shared/types/enduser.type";
 import { CalendarIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import React from "react";
+import { Link } from "react-router-dom";
 
 type EnduserSearchItemProps = {
   endUser: EndUser;
@@ -34,8 +35,13 @@ const EnduserSearchItem = ({ endUser }: EnduserSearchItemProps) => {
           </div>
         </div>
         <Button variant="secondary">
-          Message
-          <PaperPlaneIcon className="h-4 w-4 ml-2" />
+          <Link
+            to={"/conversations/create-conversation?userId=" + endUser._id}
+            className="flex gap-1 items-center"
+          >
+            Message
+            <PaperPlaneIcon className="h-4 w-4 ml-2" />
+          </Link>
         </Button>
       </div>
     </Card>
