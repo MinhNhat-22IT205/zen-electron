@@ -21,6 +21,7 @@ const createWindow = (): void => {
       contextIsolation: false,
       webSecurity: false,
       allowRunningInsecureContent: true,
+      partition: 'persist:app-session' 
     },
   });
 

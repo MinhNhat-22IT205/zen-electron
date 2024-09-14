@@ -1,0 +1,4 @@
+const ENDUSER_SEARCH_API_ENDPOINT = '/endusers/search';
+const FEED_SEARCH_API_ENDPOINT = '/posts/search';
+
+export { ENDUSER_SEARCH_API_ENDPOINT, FEED_SEARCH_API_ENDPOINT };

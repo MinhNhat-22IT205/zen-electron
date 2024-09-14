@@ -9,6 +9,7 @@ import LoginForm from "../features/authentication/components/LoginForm";
 import RegisterForm from "../features/authentication/components/RegisterForm";
 import AuthLayout from "../features/authentication/components/AuthLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import SearchPage from "../features/search/components/SearchPage";
 
 const AppRoutes = () => {
   return (
@@ -35,7 +36,7 @@ const AppRoutes = () => {
             <Route path="feeds" element={<FeedPageLayout />}>
               <Route index element={<FeedPage />} />
             </Route>
-            <Route path="users" element={<></>} />
+            <Route path="search" element={<SearchPage />} />
           </Route>
 
           {/* Chat page */}
