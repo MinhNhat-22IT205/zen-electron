@@ -32,7 +32,9 @@ const MessageList = () => {
     <>
       <ScrollArea className="flex-1 h-full w-full">
         <div className="">
-          {messages?.map((message) => <Message message={message} />)}
+          {messages?.map((message) => (
+            <Message key={message._id} message={message} />
+          ))}
         </div>
       </ScrollArea>
       {/* Chat Input */}

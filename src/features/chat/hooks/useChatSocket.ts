@@ -1,34 +1,42 @@
 import { useEffect, useCallback } from "react";
 import { Message } from "@/src/shared/types/message.type";
 import { Socket } from "socket.io-client";
+import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
+import { useUnreadConversationStore } from "@/src/shared/libs/zustand/unread-conversation.zustand";
 
 export default function useChatSocket(
   conversationId: string,
   addMessageToUI: (message: Message) => void,
   clientSocket: Socket
 ) {
+  const unreadConversationStore=useUnreadConversationStore((state)=>state)
+  const myEndUserId = useAuthStore((state) => state.endUser?._id);
   useEffect(() => {
     // Only add listeners if a conversation ID exists
     if (!conversationId) return;
 
     clientSocket.on("connect", () => {
-      console.log("Connected");
     });
-
+    
     clientSocket.on("connect_error", (err) => {
       console.error("Connection error: ", err);
     });
-
+    
     clientSocket.on("disconnect", () => {
       console.log("Disconnected");
     });
-
+    
+    clientSocket.emit("endUserConnect", { endUserId: myEndUserId });
     // Join the conversation
-    clientSocket.emit("joinConversation", { conversationId });
+    // clientSocket.emit("joinConversation", { conversationId });
 
     // Listen for new messages
     const handleSendMessage = (message: Message) => {
-      addMessageToUI(message);
+      if(message.conversationId==conversationId){
+        addMessageToUI(message);
+      }else{
+        unreadConversationStore.addUnreadConversationId(message.conversationId)
+      }
     };
     clientSocket.on("sendMessage", handleSendMessage);
 

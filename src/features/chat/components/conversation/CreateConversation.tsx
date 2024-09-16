@@ -9,7 +9,6 @@ const CreateConversation = () => {
   const authStore = useAuthStore((state) => state);
   useEffect(() => {
     (async () => {
-      console.log("endUserId", authStore.endUser);
       await addConversation([authStore.endUser._id, endUserId]);
     })();
   }, []);
