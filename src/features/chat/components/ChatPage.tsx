@@ -3,12 +3,13 @@ import { ArrowLeftIcon, TriangleLeftIcon } from "@radix-ui/react-icons";
 import { Outlet, useNavigate } from "react-router-dom";
 import ConversationList from "./conversation/ConversationList";
 import { io } from "socket.io-client";
-import useMessageNotifySocket from "../hooks/useMessageNotifySocket";
+import useOutsideListenerSocket from "../hooks/useOutsideListenerSocket";
+import { SERVER_SOCKET_URL } from "@/src/shared/libs/socketio/client-socket.base";
 
-const clientSocket = io("http://localhost:3001");
+const clientSocket = io(SERVER_SOCKET_URL);
 const ChatPage = () => {
   const navigate = useNavigate();
-  useMessageNotifySocket(clientSocket);
+  useOutsideListenerSocket(clientSocket);
 
   return (
     <div className="h-screen w-full flex flex-col ">

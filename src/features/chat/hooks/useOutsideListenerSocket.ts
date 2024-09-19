@@ -5,7 +5,7 @@ import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
-const useMessageNotifySocket = (clientSocket:Socket) => {
+const useOutsideListenerSocket = (clientSocket:Socket) => {
     const myEndUserId = useAuthStore((state) => state.endUser?._id);
     const {id :conversationId}=useParams()
     const unreadConversationStore=useUnreadConversationStore((state)=>state)
@@ -41,4 +41,4 @@ const useMessageNotifySocket = (clientSocket:Socket) => {
   return {}
 }
 
-export default useMessageNotifySocket
+export default useOutsideListenerSocket

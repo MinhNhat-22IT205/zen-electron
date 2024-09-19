@@ -12,8 +12,12 @@ import { Button } from "@/src/shared/components/shadcn-ui/button";
 import { ImageIcon, Link2Icon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { Input } from "@/src/shared/components/shadcn-ui/input";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
+import { SERVER_SOCKET_URL } from "@/src/shared/libs/socketio/client-socket.base";
+import { useDisclosure } from "@/src/shared/hooks/use-disclosure";
+import CallRequestDialog from "../call/CallRequestDialog";
+import useRequestCallDialog from "../../hooks/useRequestCallDialog";
 
-const clientSocket = io("http://localhost:3001");
+const clientSocket = io(SERVER_SOCKET_URL);
 
 const MessageList = () => {
   const { id } = useParams();
@@ -23,10 +27,26 @@ const MessageList = () => {
     fetcher,
   );
   const addMessageToUI = (message: MessageType) => {
-    console.log("igotcalled");
     mutate((prev) => [...prev, message], false);
   };
-  const { emitMessage } = useChatSocket(id, addMessageToUI, clientSocket);
+  const {
+    close,
+    open,
+    isOpen,
+    sender,
+    setSender,
+    callingConversationId,
+    setCallingConversationId,
+  } = useRequestCallDialog();
+  const { emitMessage, acceptCall, denyCall } = useChatSocket(
+    id,
+    addMessageToUI,
+    clientSocket,
+    setSender,
+    open,
+    setCallingConversationId,
+    callingConversationId,
+  );
 
   return (
     <>
@@ -62,6 +82,22 @@ const MessageList = () => {
           <Link2Icon className="w-4 h-4" />
         </Button>
       </div>
+      <CallRequestDialog
+        isOpen={isOpen}
+        onChange={(isOpen) => {
+          if (!isOpen) {
+            denyCall();
+            close();
+          } else {
+            open();
+          }
+          close();
+        }}
+        sender={sender}
+        callingConversationId={callingConversationId}
+        acceptCall={acceptCall}
+        denyCall={denyCall}
+      />
     </>
   );
 };
