@@ -12,6 +12,10 @@ const servers = {
   ],
 };
 
+let localStream: MediaStream | null = null;
+
+let peerConnections: { [key: string]: RTCPeerConnection } = {};
+
 const useCallSocket = (clientSocket: Socket) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -20,11 +24,6 @@ const useCallSocket = (clientSocket: Socket) => {
   const isSender = isSenderString === "true";
   const myEndUser = useAuthStore((state) => state.endUser);
 
-  const [peerConnections, setPeerConnections] = React.useState<{
-    [key: string]: RTCPeerConnection;
-  }>({});
-  const [localStream, setLocalStream] = React.useState<MediaStream>();
-
   const media_constraints = {
     video: {
       width: { min: 640, ideal: 1920, max: 1920 },
@@ -32,19 +31,19 @@ const useCallSocket = (clientSocket: Socket) => {
     },
     audio: true,
   };
-  const addPeerConnection = (
-    memberId: string,
-    peerConnection: RTCPeerConnection,
-  ) => {
-    setPeerConnections((prev) => ({
-      ...prev,
-      [memberId]: peerConnection,
-    }));
-  };
-  const removePeerConnection = (memberId: string) => {
-    const { [memberId]: _, ...rest } = peerConnections;
-    setPeerConnections(rest);
-  };
+  // const addPeerConnection = (
+  //   memberId: string,
+  //   peerConnection: RTCPeerConnection,
+  // ) => {
+  //   setPeerConnections((prev) => ({
+  //     ...prev,
+  //     [memberId]: peerConnection,
+  //   }));
+  // };
+  // const removePeerConnection = (memberId: string) => {
+  //   const { [memberId]: _, ...rest } = peerConnections;
+  //   setPeerConnections(rest);
+  // };
   useEffect(() => {
     (async () => {
       clientSocket.on("connect", () => {
@@ -77,7 +76,7 @@ const useCallSocket = (clientSocket: Socket) => {
         toEndUserId: string;
         data: any;
       }) => {
-        console.log("Message from peer's userid type", typeof fromEndUserId);
+        console.log("Message from peer type", type);
         if (type === "offer") {
           //data:offer
           createAnswer(fromEndUserId, data);
@@ -112,16 +111,17 @@ const useCallSocket = (clientSocket: Socket) => {
       }: {
         endUserId: string;
       }) => {
+        console.log("Request accepted", joinerId);
         createOffer(joinerId);
       };
 
       const handleRequestDenied = (data: any) => {
         navigate("/conversations");
       };
-      clientSocket.on("requestDenied", handleRequestDenied);
+      clientSocket.on("requestDeny", handleRequestDenied);
 
       // when user joined
-      clientSocket.on("requestAccepted", handleRequestAccepted);
+      clientSocket.on("requestAccept", handleRequestAccepted);
 
       clientSocket.on("memberLeft", handleUserLeft);
 
@@ -130,23 +130,35 @@ const useCallSocket = (clientSocket: Socket) => {
       if (isSender) {
         clientSocket.emit("requestCall", {
           conversationId,
-          endUserId: myEndUser,
+          endUserId: myEndUser._id,
+        });
+      } else {
+        clientSocket.emit("requestAccept", {
+          conversationId: conversationId,
+          endUserId: myEndUser._id,
         });
       }
-      let localStream =
+      localStream =
         await navigator.mediaDevices.getUserMedia(media_constraints);
       (document.getElementById("user-1") as HTMLVideoElement).srcObject =
         localStream;
     })();
 
-    return () => {};
+    return () => {
+      localStream = null;
+      Object.keys(peerConnections).forEach((memberId) => {
+        peerConnections[memberId].close();
+      });
+      peerConnections = {};
+    };
   }, []);
 
-  let createOffer = async (joinerId: string) => {
+  const createOffer = async (joinerId: string) => {
     await createPeerConnection(joinerId);
 
-    let offer = await peerConnections[joinerId].createOffer();
-    await peerConnections[joinerId].setLocalDescription(offer);
+    console.log("Peer connection", peerConnections[joinerId], peerConnections);
+    let offer = await peerConnections[joinerId]?.createOffer();
+    await peerConnections[joinerId]?.setLocalDescription(offer);
 
     clientSocket.emit("callMessageFromPeer", {
       type: "offer",
@@ -154,13 +166,14 @@ const useCallSocket = (clientSocket: Socket) => {
       toEndUserId: joinerId,
       data: offer,
     });
+    console.log("Offer sent to", joinerId);
   };
 
-  let createPeerConnection = async (memberId: string) => {
+  const createPeerConnection = async (memberId: string) => {
     const peerConnection = new RTCPeerConnection(servers);
-    addPeerConnection(memberId, peerConnection);
+    peerConnections[memberId] = peerConnection;
 
-    let remoteStream = new MediaStream();
+    const remoteStream = new MediaStream();
     const remoteVideo = document.createElement("video");
     remoteVideo.srcObject = remoteStream;
     remoteVideo.autoplay = true;
@@ -170,18 +183,16 @@ const useCallSocket = (clientSocket: Socket) => {
     document.getElementById("videos").append(remoteVideo);
 
     document.getElementById("user-1").classList.add("smallFrame");
-
+    console.log("Local stream", localStream);
     if (!localStream) {
-      let localStream = await navigator.mediaDevices.getUserMedia({
+      localStream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
-      setLocalStream(localStream);
       (document.getElementById("user-1") as HTMLVideoElement).srcObject =
         localStream;
     }
-
-    localStream.getTracks().forEach((track) => {
+    localStream?.getTracks().forEach((track) => {
       console.log(`Adding track: ${track.kind}`);
       peerConnection.addTrack(track, localStream);
     });
@@ -201,7 +212,8 @@ const useCallSocket = (clientSocket: Socket) => {
       if (event.candidate) {
         clientSocket.emit("callMessageFromPeer", {
           type: "candidate",
-          receiverId: memberId,
+          fromEndUserId: myEndUser._id,
+          toEndUserId: memberId,
           data: event.candidate,
         });
       }
@@ -211,11 +223,12 @@ const useCallSocket = (clientSocket: Socket) => {
   const createAnswer = async (memberId: string, offer: any) => {
     await createPeerConnection(memberId);
 
-    await peerConnections[memberId].setRemoteDescription(offer);
+    await peerConnections[memberId]?.setRemoteDescription(offer);
     console.log("Remote description set for", memberId);
 
-    let answer = await peerConnections[memberId].createAnswer();
-    await peerConnections[memberId].setLocalDescription(answer);
+    console.log("second localDes");
+    let answer = await peerConnections[memberId]?.createAnswer();
+    await peerConnections[memberId]?.setLocalDescription(answer);
 
     clientSocket.emit("callMessageFromPeer", {
       type: "answer",
@@ -223,12 +236,13 @@ const useCallSocket = (clientSocket: Socket) => {
       toEndUserId: memberId,
       data: answer,
     });
+    console.log("Answer sent to", memberId);
   };
 
   const addAnswer = async (memberId: string, answer: any) => {
-    if (!peerConnections[memberId].currentRemoteDescription) {
-      peerConnections[memberId].setRemoteDescription(answer);
-      console.log("Remote description added for", memberId);
+    if (!peerConnections[memberId]?.currentRemoteDescription) {
+      peerConnections[memberId]?.setRemoteDescription(answer);
+      console.log("Addanswer: Remote description added for", memberId);
     }
   };
 

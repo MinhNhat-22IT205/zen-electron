@@ -20,7 +20,6 @@ import { useNavigate } from "react-router-dom";
 type CallRequestDialogProps = {
   isOpen: boolean;
   onChange: (isOpen: boolean) => void;
-  acceptCall: () => void;
   denyCall: () => void;
   sender: EndUser;
   callingConversationId: string;
@@ -28,7 +27,6 @@ type CallRequestDialogProps = {
 const CallRequestDialog = ({
   isOpen,
   onChange,
-  acceptCall,
   denyCall,
   sender,
   callingConversationId,
@@ -49,7 +47,6 @@ const CallRequestDialog = ({
             variant="default"
             className="bg-green-300 text-white"
             onClick={() => {
-              acceptCall();
               navigate(
                 `/call-room?conversationId=${callingConversationId}&isSender=false`,
               );

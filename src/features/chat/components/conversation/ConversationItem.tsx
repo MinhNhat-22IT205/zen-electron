@@ -34,16 +34,16 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
       >
         <Avatar>
           <AvatarImage
-            src={"localhost:3001/uploads/" + otherEndUser.avatar}
+            src={"localhost:3001/uploads/" + otherEndUser?.avatar}
             alt="@shadcn"
           />
-          <AvatarFallback>{otherEndUser.username.charAt(0)}</AvatarFallback>
+          <AvatarFallback>{otherEndUser?.username.charAt(0)}</AvatarFallback>
         </Avatar>
 
         <div
           className={`flex flex-col items-start justify-center ${!!unreadConversationIds.find((id) => id == conversation._id) && "font-bold"}`}
         >
-          <p>{otherEndUser.username}</p>
+          <p>{otherEndUser?.username}</p>
           <p className="text-gray-500 truncate">Last Message</p>
         </div>
       </div>

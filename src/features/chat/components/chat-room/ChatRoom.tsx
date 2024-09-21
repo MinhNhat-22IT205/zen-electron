@@ -13,13 +13,14 @@ import React, { useEffect } from "react";
 import MessageList from "./MessageList";
 import useSWR from "swr";
 import { CONVERSTAION_API_ENDPOINT } from "../../api/chat-endpoints.api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
 import { Conversation } from "@/src/shared/types/conversation.type";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useUnreadConversationStore } from "@/src/shared/libs/zustand/unread-conversation.zustand";
 
 const ChatRoom = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const unreadConversationStore = useUnreadConversationStore((state) => state);
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
@@ -38,7 +39,14 @@ const ChatRoom = () => {
       <div className="flex justify-between items-center p-2 border-b">
         <Text className="flex-1 font-bold"> {otherEndUser?.username} </Text>
         <div className="flex items-center justify-between">
-          <Button variant="ghost">Video</Button>
+          <Button
+            variant="ghost"
+            onClick={() =>
+              navigate(`/call-room?conversationId=${id}&isSender=true`)
+            }
+          >
+            Video
+          </Button>
           <Button variant="ghost">Audio</Button>
         </div>
       </div>

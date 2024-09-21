@@ -38,7 +38,7 @@ const MessageList = () => {
     callingConversationId,
     setCallingConversationId,
   } = useRequestCallDialog();
-  const { emitMessage, acceptCall, denyCall } = useChatSocket(
+  const { emitMessage, denyCall } = useChatSocket(
     id,
     addMessageToUI,
     clientSocket,
@@ -95,7 +95,6 @@ const MessageList = () => {
         }}
         sender={sender}
         callingConversationId={callingConversationId}
-        acceptCall={acceptCall}
         denyCall={denyCall}
       />
     </>
