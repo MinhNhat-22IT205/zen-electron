@@ -8,8 +8,8 @@ const RightSidebar = () => {
   return (
     <div className="h-full w-72 p-4 shadow-xl bg-white">
       {/* User Requests */}
-      <Heading>Requests</Heading>
-      <div className="flex items-center justify-center space-x-3 gap-2">
+      <Heading>Friend requests</Heading>
+      {/* <div className="flex items-center justify-center space-x-3 gap-2">
         <img
           className="w-12 h-12 rounded-full"
           src="https://via.placeholder.com/150"
@@ -29,13 +29,13 @@ const RightSidebar = () => {
             </Button>
           </div>
         </div>
-      </div>
-
-      <div className="border-2 border-dashed mt-6" />
+      </div> */}
+      <div className="h-40" />
+      <div className="border-2 border-dashed mt-6 mb-4" />
 
       {/* Navigation Links */}
       <Heading>Suggestion for you</Heading>
-      <div className="flex items-center justify-center space-x-3 gap-2">
+      {/* <div className="flex items-center justify-center space-x-3 gap-2">
         <img
           className="w-12 h-12 rounded-full"
           src="https://via.placeholder.com/150"
@@ -50,7 +50,7 @@ const RightSidebar = () => {
         <Button variant="ghost" className="text-gray-500">
           <PlusCircledIcon className="w-5 h-5" />
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 };

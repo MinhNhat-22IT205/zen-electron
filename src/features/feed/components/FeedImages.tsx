@@ -9,7 +9,7 @@ const FeedImages = ({ images }: FeedImagesProps) => {
       {images.map((src, index) => (
         <img
           key={index}
-          src={src}
+          src={"http://localhost:3001/uploads/" + src}
           alt={`Feed Image ${index + 1}`}
           className="w-full h-40 object-cover rounded-md"
         />

@@ -16,19 +16,27 @@ import {
 } from "@/src/shared/components/shadcn-ui/avatar";
 import Text from "@/src/shared/components/shadcn-ui/text";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
+import { Post, PostJson } from "@/src/shared/types/feed.type";
+import { timeAgo } from "@/src/shared/helpers/timeAgo";
 
-const Feed = () => {
+type FeedProps = {
+  feed: PostJson;
+};
+
+const Feed = ({ feed }: FeedProps) => {
   return (
     <Card>
       <CardContent>
         <div className="flex items-center justify-between gap-3 mt-2 mb-2">
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback>{feed.endUser.username}</AvatarFallback>
           </Avatar>
           <div>
-            <Text className="">Chanlie Ward</Text>
-            <Text className="text-gray-500 !mt-0">Just now</Text>
+            <Text className="">{feed.endUser.username}</Text>
+            <Text className="text-gray-500 !mt-0">
+              {timeAgo(new Date(feed.createdAt))}
+            </Text>
           </div>
           <div className="flex-1 justify-end flex">
             <Button variant="ghost">
@@ -36,29 +44,22 @@ const Feed = () => {
             </Button>
           </div>
         </div>
-        <FeedImages
-          images={[
-            "https://digital.nix.edu.vn/img/brand/logo.svg",
-            "https://digital.nix.edu.vn/img/brand/logo.svg",
-          ]}
-        />
-        <Text>
-          a long text that is supposed to be a caption for the image that was
-          just posted by the user on the feed of the app that is being built by
-          the developer who is writing this code. The text is long enough to be
-          able to test the overflow of the text and see how it looks when it is
-          cut off. The text is long enough to be able to test the overflow of
-          the text and see how it looks when it is cut off.
-        </Text>
+
+        <Text className="font-bold text-2xl">{feed.title}</Text>
+        <Text>{feed.body}</Text>
+        <FeedImages images={feed.images} />
         <div className="flex justify-between items-center">
-          <Button variant="ghost">
-            <HeartIcon className="h-4 w-4 mr-2" /> 4.5k
+          <Button
+            variant="ghost"
+            className={feed.hasLiked ? "text-pink-500" : ""}
+          >
+            <HeartIcon className="h-4 w-4 mr-2" /> {feed.numOfLikes}
           </Button>
           <Button variant="ghost">
-            <ChatBubbleIcon className="h-4 w-4 mr-2" /> 1.2k
+            <ChatBubbleIcon className="h-4 w-4 mr-2" />
           </Button>
           <Button variant="ghost">
-            <Share1Icon className="h-4 w-4 mr-2" /> 1.2k
+            <Share1Icon className="h-4 w-4 mr-2" />
           </Button>
           <div className="flex-1" />
           <Button variant="ghost">
