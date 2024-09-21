@@ -45,7 +45,39 @@ const useCallSocket = (clientSocket: Socket) => {
   //   setPeerConnections(rest);
   // };
   useEffect(() => {
+    const reset = () => {
+      console.log("Resetting connections and streams");
+
+      // Stop and reset localStream
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+        localStream = null;
+      }
+
+      // Close and reset all peerConnections
+      Object.keys(peerConnections).forEach((memberId) => {
+        peerConnections[memberId].close();
+        delete peerConnections[memberId];
+      });
+
+      // Remove any leftover video elements (if any)
+      const videoContainer = document.getElementById("videos");
+      if (videoContainer) {
+        Array.from(videoContainer.children).forEach((child) => {
+          if (child.id !== "user-1") {
+            videoContainer.removeChild(child);
+          }
+        });
+      }
+
+      // Reset socket listeners if necessary
+      clientSocket.off("requestDeny");
+      clientSocket.off("requestAccept");
+      clientSocket.off("memberLeft");
+      clientSocket.off("callMessageFromPeer");
+    };
     (async () => {
+      reset();
       clientSocket.on("connect", () => {
         clientSocket.emit("endUserConnect", { endUserId: myEndUser._id });
 
@@ -60,11 +92,12 @@ const useCallSocket = (clientSocket: Socket) => {
         console.log("Disconnected");
       });
 
-      const handleUserJoined = (data: any) => {
-        console.log("User Joined", data);
-      };
       const handleUserLeft = ({ fromEndUserId }: { fromEndUserId: string }) => {
         document.getElementById(fromEndUserId).style.display = "none";
+        if (peerConnections[fromEndUserId]) {
+          peerConnections[fromEndUserId].close();
+          delete peerConnections[fromEndUserId];
+        }
       };
       const handleMessageFromPeer = async ({
         type,
@@ -116,6 +149,7 @@ const useCallSocket = (clientSocket: Socket) => {
       };
 
       const handleRequestDenied = (data: any) => {
+        reset();
         navigate("/conversations");
       };
       clientSocket.on("requestDeny", handleRequestDenied);
@@ -145,11 +179,7 @@ const useCallSocket = (clientSocket: Socket) => {
     })();
 
     return () => {
-      localStream = null;
-      Object.keys(peerConnections).forEach((memberId) => {
-        peerConnections[memberId].close();
-      });
-      peerConnections = {};
+      reset();
     };
   }, []);
 
@@ -247,9 +277,6 @@ const useCallSocket = (clientSocket: Socket) => {
   };
 
   const leaveChannel = async () => {
-    localStream.getTracks().forEach((track) => {
-      track.stop();
-    });
     Object.keys(peerConnections).forEach((memberId) => {
       peerConnections[memberId].close();
     });
@@ -257,6 +284,7 @@ const useCallSocket = (clientSocket: Socket) => {
       conversationId,
       fromEndUserId: myEndUser._id,
     });
+    peerConnections = {};
     navigate("/conversations");
   };
 

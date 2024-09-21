@@ -95,7 +95,10 @@ const MessageList = () => {
         }}
         sender={sender}
         callingConversationId={callingConversationId}
-        denyCall={denyCall}
+        denyCall={() => {
+          denyCall();
+          close();
+        }}
       />
     </>
   );

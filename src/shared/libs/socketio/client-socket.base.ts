@@ -1,2 +1,2 @@
-const SERVER_SOCKET_URL = "http://192.168.1.8:3001";
+const SERVER_SOCKET_URL = "http://localhost:3001";
 export { SERVER_SOCKET_URL };

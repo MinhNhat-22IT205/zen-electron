@@ -69,7 +69,10 @@ export default function useChatSocket(
   };
 
   const denyCall = () => {
-    clientSocket.emit("requestDeny", { callingConversationId });
+    clientSocket.emit("requestDeny", {
+      conversationId: callingConversationId,
+      fromEndUserId: myEndUserId,
+    });
   };
 
   return { emitMessage, denyCall };

@@ -25,7 +25,11 @@ const CallRoom = () => {
         <div className="control-container" id="mic-btn" onClick={toggleMic}>
           Mic
         </div>
-        <div className="control-container" id="leave-btn">
+        <div
+          className="control-container"
+          id="leave-btn"
+          onClick={leaveChannel}
+        >
           Leave
         </div>
       </div>
