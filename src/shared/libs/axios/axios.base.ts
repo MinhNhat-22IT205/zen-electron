@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const http = axios.create({
-  baseURL: "http://localhost:3001/v1",
+  baseURL: "http://192.168.1.8:3001/v1",
   timeout: 6000,
-  withCredentials: true
+  withCredentials: true,
 });
 
 export default http;
