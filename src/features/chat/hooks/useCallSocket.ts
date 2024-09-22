@@ -31,19 +31,7 @@ const useCallSocket = (clientSocket: Socket) => {
     },
     audio: true,
   };
-  // const addPeerConnection = (
-  //   memberId: string,
-  //   peerConnection: RTCPeerConnection,
-  // ) => {
-  //   setPeerConnections((prev) => ({
-  //     ...prev,
-  //     [memberId]: peerConnection,
-  //   }));
-  // };
-  // const removePeerConnection = (memberId: string) => {
-  //   const { [memberId]: _, ...rest } = peerConnections;
-  //   setPeerConnections(rest);
-  // };
+
   useEffect(() => {
     const reset = () => {
       console.log("Resetting connections and streams");
@@ -53,6 +41,7 @@ const useCallSocket = (clientSocket: Socket) => {
         localStream.getTracks().forEach((track) => track.stop());
         localStream = null;
       }
+      localStream = null;
 
       // Close and reset all peerConnections
       Object.keys(peerConnections).forEach((memberId) => {
