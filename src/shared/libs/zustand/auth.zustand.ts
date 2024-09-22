@@ -15,9 +15,11 @@ const useAuthStore = create<AuthStore>()(
       password: "",
       avatar: "",
       description: "",
+      createdAt: "",
+      updatedAt: "",
     },
     setEndUser: (endUser) => set({ endUser }),
-  }))
+  })),
 );
 
 export { useAuthStore };
