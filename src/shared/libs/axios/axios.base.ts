@@ -1,7 +1,8 @@
 import axios from "axios";
+import { AXIOS_BASE_URL } from "../../constants/base-paths";
 
 const http = axios.create({
-  baseURL: "http://localhost:3001/v1",
+  baseURL: AXIOS_BASE_URL,
   timeout: 30000,
   withCredentials: true,
 });
