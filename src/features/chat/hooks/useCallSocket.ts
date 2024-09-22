@@ -275,7 +275,7 @@ const useCallSocket = (clientSocket: Socket) => {
       fromEndUserId: myEndUser._id,
     });
     peerConnections = {};
-    navigate("/conversations");
+    navigate("/conversations/" + conversationId);
   };
 
   const toggleCamera = async () => {
