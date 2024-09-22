@@ -1,3 +1,4 @@
+import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
 import React from "react";
 
 type FeedImagesProps = {
@@ -9,7 +10,7 @@ const FeedImages = ({ images }: FeedImagesProps) => {
       {images.map((src, index) => (
         <img
           key={index}
-          src={"http://localhost:3001/uploads/" + src}
+          src={IMAGE_BASE_URL + src}
           alt={`Feed Image ${index + 1}`}
           className="w-full h-40 object-cover rounded-md"
         />
