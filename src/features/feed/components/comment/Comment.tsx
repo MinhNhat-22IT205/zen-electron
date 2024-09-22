@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Comment as CommentType } from "@/src/shared/types/comment.type";
 import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ type CommentProps = {
   onReply: (comment: CommentType) => void;
   onShowReplies: (comment: CommentType) => void;
   replyingComment: CommentType;
+  isFirst: boolean;
 };
 
 const Comment = ({
@@ -17,20 +18,28 @@ const Comment = ({
   onShowReplies,
   replyLists,
   replyingComment,
+  isFirst,
 }: CommentProps) => {
   const navigate = useNavigate();
   const isBeingReplied = replyingComment?._id === comment._id;
-  const [repliesIsOpen, setRepliesIsOpen] = useState(!comment.hasReplies);
+  const [repliesIsOpen, setRepliesIsOpen] = useState(
+    isFirst ? !comment.hasReplies : true,
+  );
+  useEffect(() => {
+    if (!isFirst) {
+      onShowReplies(comment);
+    }
+  }, []);
 
   const replies = replyLists.filter(
     (reply) => reply.parentCommentId === comment._id,
   );
   const createdAt = new Date(comment.createdAt).toLocaleDateString();
   return (
-    <div
-      className={`flex-row w-fit gap-3 mb-2 ${isBeingReplied && "bg-blue-200 p-2 rouded-lg"}`}
-    >
-      <div className="p-4 bg-gray-100 rounded-2xl shadow-md w-fit">
+    <div className={`flex-row w-fit gap-3`}>
+      <div
+        className={`p-4 bg-gray-100 rounded-2xl mb-4 w-fit  ${isBeingReplied && "!bg-gray-300 p-2 rouded-lg"}`}
+      >
         <div className="flex">
           <img
             className="w-10 h-10 rounded-full mr-4"
@@ -52,7 +61,7 @@ const Comment = ({
         {repliesIsOpen || !comment.hasReplies ? (
           <button
             onClick={() => onReply(comment)}
-            className="text-blue-500 hover:text-blue-700 text-xs"
+            className="text-blue-500 hover:text-blue-700 text-xs ml-auto text-right"
           >
             Reply
           </button>
@@ -60,7 +69,7 @@ const Comment = ({
           <div className="h-2" />
         )}
       </div>
-      {comment.hasReplies && (
+      {(isFirst ? comment.hasReplies : true) && (
         <>
           {!repliesIsOpen ? (
             <button
@@ -82,6 +91,7 @@ const Comment = ({
                   replyingComment={replyingComment}
                   onReply={(reply) => onReply(reply)}
                   onShowReplies={(reply) => onShowReplies(reply)}
+                  isFirst={false}
                 />
               ))}
             </div>

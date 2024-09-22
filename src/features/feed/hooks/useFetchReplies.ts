@@ -12,6 +12,7 @@ export function useFetchReplies() {
       const result = await http.get(
         `/comment?limit=100&skip=0&postId=${comment.postId}&parentCommentId=${comment._id}`,
       );
+
       setReplyLists([...replyLists, ...result.data]);
       return result;
     } catch (e) {

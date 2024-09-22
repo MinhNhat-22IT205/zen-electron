@@ -2,6 +2,11 @@ import { SERVER_SOCKET_URL } from "@/src/shared/libs/socketio/client-socket.base
 import { io } from "socket.io-client";
 import useCallSocket from "../../hooks/useCallSocket";
 import { useLocation } from "react-router-dom";
+import {
+  CameraIcon,
+  ExitIcon,
+  SpeakerModerateIcon,
+} from "@radix-ui/react-icons";
 
 const clientSocket = io(SERVER_SOCKET_URL);
 
@@ -20,17 +25,17 @@ const CallRoom = () => {
           id="camera-btn"
           onClick={toggleCamera}
         >
-          Cam
+          <CameraIcon className="w-4 h-4" />
         </div>
         <div className="control-container" id="mic-btn" onClick={toggleMic}>
-          Mic
+          <SpeakerModerateIcon className="w-4 h-4" />
         </div>
         <div
           className="control-container"
           id="leave-btn"
           onClick={leaveChannel}
         >
-          Leave
+          <ExitIcon className="w-4 h-4" />
         </div>
       </div>
     </div>

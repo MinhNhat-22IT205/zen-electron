@@ -72,6 +72,7 @@ const CommentDialog = ({ isOpen, onChange, post }: CommentDialogProps) => {
               onShowReplies={(comment) => {
                 fetchReplies(comment);
               }}
+              isFirst={true}
             />
           ))}
           {comments.length > 8 && !isReachingEnd && (
