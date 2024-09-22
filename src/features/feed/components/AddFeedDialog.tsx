@@ -29,7 +29,7 @@ import { zAddPostInputs, ztAddPostInputs } from "../lib/add-feed.zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/src/shared/components/shadcn-ui/textarea";
-import { getImageData } from "@/src/shared/helpers/get-image-data";
+import { getImageDataArray } from "@/src/shared/helpers/get-image-data";
 import { addFeed } from "../api/feed.api";
 
 type AddFeedDialogProps = {
@@ -101,7 +101,7 @@ const AddFeedDialog = ({ isOpen, onChange }: AddFeedDialogProps) => {
                       multiple
                       {...rest}
                       onChange={(event) => {
-                        const { files, displayUrls } = getImageData(event);
+                        const { files, displayUrls } = getImageDataArray(event);
                         setPreviews(displayUrls);
                         console.log(
                           "files",

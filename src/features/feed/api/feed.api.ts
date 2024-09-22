@@ -15,17 +15,6 @@ const addFeed = async (values: ztAddPostInputs) => {
         formData.append("files", file); // Use the same field name as defined in your server
       });
     }
-    // inputs.images.forEach((uri) => {
-    //   const fileName = uri.split("/").pop();
-    //   const fileType = fileName.split(".").pop();
-    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //   // @ts-expect-error
-    //   formData.append("files", {
-    //     uri,
-    //     name: fileName,
-    //     type: `image/${fileType}`
-    //   });
-    // });
     const result = await http.post<PostJson>(ADD_FEED_API_ENDPOINT, formData, {
       headers: {
         "Content-Type": "multipart/form-data",

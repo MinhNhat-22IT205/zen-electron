@@ -5,6 +5,7 @@ import {
 } from "@/src/shared/components/shadcn-ui/avatar";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
 import { Card } from "@/src/shared/components/shadcn-ui/card";
+import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
 import { EndUser } from "@/src/shared/types/enduser.type";
 import { CalendarIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import React from "react";
@@ -19,18 +20,19 @@ const EnduserSearchItem = ({ endUser }: EnduserSearchItemProps) => {
     <Card className="p-3">
       <div className="flex justify-between space-x-4 w-full">
         <Avatar>
-          <AvatarImage src="https://github.com/vercel.png" />
+          <AvatarImage src={IMAGE_BASE_URL + endUser.avatar} />
           <AvatarFallback>{endUser.username}</AvatarFallback>
         </Avatar>
-        <div className="space-y-1">
+        <div className="space-y-1 flex flex-col items-start w-full flex-1">
           <h4 className="text-sm font-semibold">{endUser.username}</h4>
-          <p className="text-sm">
-            The React Framework – created and maintained by @vercel.
-          </p>
+          <p className="text-sm">{endUser.description}</p>
           <div className="flex items-center pt-2">
             <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />{" "}
             <span className="text-xs text-muted-foreground">
-              Joined December 2021
+              {new Date(endUser.createdAt).toLocaleString("en-US", {
+                month: "long",
+                year: "numeric",
+              })}
             </span>
           </div>
         </div>

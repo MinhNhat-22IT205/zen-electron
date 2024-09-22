@@ -5,6 +5,8 @@ type EndUser = {
   password: string;
   avatar: string;
   description: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type EndUserMinimal = Pick<EndUser, "_id" | "username" | "avatar">;
@@ -25,5 +27,5 @@ export {
   EndUserMinimal,
   EndUserSearchMinimal,
   EndUserProfile,
-  EndUserProfileMinimal
+  EndUserProfileMinimal,
 };

@@ -28,9 +28,7 @@ const LeftSidebar = () => {
             src={IMAGE_BASE_URL + authStore.endUser.avatar}
             alt="User Avatar"
             onClick={() => navigate("user-profile/" + authStore.endUser._id)}
-          >
-            {authStore.endUser.username.charAt(0)}
-          </AvatarImage>
+          />
           <AvatarFallback>
             {authStore.endUser.username.charAt(0)}
           </AvatarFallback>
