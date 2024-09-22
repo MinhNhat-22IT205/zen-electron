@@ -4,6 +4,7 @@ import { Socket } from "socket.io-client";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useUnreadConversationStore } from "@/src/shared/libs/zustand/unread-conversation.zustand";
 import { EndUser } from "@/src/shared/types/enduser.type";
+import { set } from "react-hook-form";
 
 export default function useChatSocket(
   conversationId: string,
@@ -13,6 +14,7 @@ export default function useChatSocket(
   openCallRequestDialog: () => void,
   setCallingConversationId: (conversationId: string) => void,
   callingConversationId: string,
+  setSeen: (messageId: string) => void,
 ) {
   const unreadConversationStore = useUnreadConversationStore((state) => state);
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
@@ -44,6 +46,10 @@ export default function useChatSocket(
     };
     clientSocket.on("sendMessage", handleSendMessage);
 
+    clientSocket.on("seenMessage", ({ _id }: { _id: string }) => {
+      setSeen(_id);
+    });
+
     clientSocket.on("requestCall", ({ conversationId, sender }) => {
       if (typeof conversationId !== "string") {
         console.error("Invalid conversationId");
@@ -74,6 +80,13 @@ export default function useChatSocket(
       fromEndUserId: myEndUserId,
     });
   };
+  const seenMessage = (messageId: string) => {
+    clientSocket.emit("seenMessage", {
+      messageId,
+      conversationId,
+      endUserId: myEndUserId,
+    });
+  };
 
-  return { emitMessage, denyCall };
+  return { emitMessage, denyCall, seenMessage };
 }

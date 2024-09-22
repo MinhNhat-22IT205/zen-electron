@@ -139,7 +139,7 @@ const useCallSocket = (clientSocket: Socket) => {
 
       const handleRequestDenied = (data: any) => {
         reset();
-        navigate("/conversations");
+        navigate("/conversations/" + conversationId);
       };
       clientSocket.on("requestDeny", handleRequestDenied);
 
@@ -229,6 +229,7 @@ const useCallSocket = (clientSocket: Socket) => {
 
     peerConnection.onicecandidate = async (event) => {
       if (event.candidate) {
+        console.log("Sending Ice candidate", new Date().getTime());
         clientSocket.emit("callMessageFromPeer", {
           type: "candidate",
           fromEndUserId: myEndUser._id,

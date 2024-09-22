@@ -29,6 +29,19 @@ const MessageList = () => {
   const addMessageToUI = (message: MessageType) => {
     mutate((prev) => [...prev, message], false);
   };
+  const setSeen = (messageId: string) => {
+    mutate((prev) => {
+      if (!prev) return prev;
+      const updatedMessages = prev.map((message) => {
+        if (message._id === messageId) {
+          return { ...message, read: true };
+        }
+        return message;
+      });
+      return updatedMessages;
+    }, false);
+  };
+
   const {
     close,
     open,
@@ -38,7 +51,8 @@ const MessageList = () => {
     callingConversationId,
     setCallingConversationId,
   } = useRequestCallDialog();
-  const { emitMessage, denyCall } = useChatSocket(
+
+  const { emitMessage, denyCall, seenMessage } = useChatSocket(
     id,
     addMessageToUI,
     clientSocket,
@@ -46,6 +60,7 @@ const MessageList = () => {
     open,
     setCallingConversationId,
     callingConversationId,
+    setSeen,
   );
 
   return (
@@ -53,7 +68,11 @@ const MessageList = () => {
       <ScrollArea className="flex-1 h-full w-full">
         <div className="">
           {messages?.map((message) => (
-            <Message key={message._id} message={message} />
+            <Message
+              key={message._id}
+              message={message}
+              seenMessage={seenMessage}
+            />
           ))}
         </div>
       </ScrollArea>
@@ -74,14 +93,15 @@ const MessageList = () => {
           <PaperPlaneIcon className="w-4 h-4" />
         </Button>
       </div>
-      <div className="flex items-center py-2 px-4 gap-2">
+      {/* File send control panel */}
+      {/* <div className="flex items-center py-2 px-4 gap-2">
         <Button variant="ghost" className="!p-1 !h-5">
           <ImageIcon className="w-4 h-4" />
         </Button>
         <Button variant="ghost" className="!p-1 !h-5">
           <Link2Icon className="w-4 h-4" />
         </Button>
-      </div>
+      </div> */}
       <CallRequestDialog
         isOpen={isOpen}
         onChange={(isOpen) => {
