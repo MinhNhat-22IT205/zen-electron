@@ -10,6 +10,7 @@ import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { EndUser } from "@/src/shared/types/enduser.type";
 import { useUnreadConversationStore } from "@/src/shared/libs/zustand/unread-conversation.zustand";
 import { useEffect } from "react";
+import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
 
 type ConversationItemProps = {
   conversation: Conversation;
@@ -32,9 +33,12 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
       <div
         className={`hover:bg-gray-100 cursor-pointer flex items-center justify-start gap-2 w-full p-2 rounded-lg ${id == conversation._id && "bg-gray-100"}`}
       >
-        <Avatar>
+        <Avatar
+          className="cursor-pointer"
+          onClick={() => navigate("/user-profile/" + otherEndUser?._id)}
+        >
           <AvatarImage
-            src={"localhost:3001/uploads/" + otherEndUser?.avatar}
+            src={IMAGE_BASE_URL + otherEndUser?.avatar}
             alt="@shadcn"
           />
           <AvatarFallback>{otherEndUser?.username.charAt(0)}</AvatarFallback>
@@ -44,7 +48,7 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
           className={`flex flex-col items-start justify-center ${!!unreadConversationIds.find((id) => id == conversation._id) && "font-bold"}`}
         >
           <p>{otherEndUser?.username}</p>
-          <p className="text-gray-500 truncate">Last Message</p>
+          {/* <p className="text-gray-500 truncate">Last Message</p> */}
         </div>
       </div>
     </div>

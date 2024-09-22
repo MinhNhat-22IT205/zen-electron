@@ -12,6 +12,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import SearchPage from "../features/search/components/SearchPage";
 import CreateConversation from "../features/chat/components/conversation/CreateConversation";
 import CallRoom from "../features/chat/components/call/CallRoom";
+import UserProfilePage from "../features/feed/components/user-profile/UserProfilePage";
 
 const AppRoutes = () => {
   return (
@@ -39,6 +40,7 @@ const AppRoutes = () => {
               <Route index element={<FeedPage />} />
             </Route>
             <Route path="search" element={<SearchPage />} />
+            <Route path="user-profile/:id" element={<UserProfilePage />} />
           </Route>
 
           {/* Chat page */}

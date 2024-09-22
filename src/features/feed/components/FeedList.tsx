@@ -21,8 +21,8 @@ const FeedList = () => {
     isLoadingMore,
     isRefreshing,
     error,
+    isReachingEnd,
   } = useFetchRecommendationPosts();
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   if (error) return <div>Error loading feeds: {error.message}</div>;
   return (
@@ -38,9 +38,11 @@ const FeedList = () => {
       </div>
       {feeds?.map((feed) => <Feed key={feed._id} feed={feed} />)}
       {isLoadingMore && <div>Loading...</div>}
-      <Button variant="secondary" onClick={fetchMorePosts}>
-        Load more
-      </Button>
+      {feeds?.length != 0 && !isReachingEnd && (
+        <Button variant="secondary" onClick={fetchMorePosts}>
+          Load more
+        </Button>
+      )}
     </>
   );
 };
