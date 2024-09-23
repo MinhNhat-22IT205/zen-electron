@@ -4,7 +4,7 @@ import { Socket } from "socket.io-client";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useUnreadConversationStore } from "@/src/shared/libs/zustand/unread-conversation.zustand";
 import { EndUser } from "@/src/shared/types/enduser.type";
-import { set } from "react-hook-form";
+import { useActiveUserIdStore } from "@/src/shared/libs/zustand/active-user.zustand";
 
 export default function useChatSocket(
   conversationId: string,
@@ -33,8 +33,6 @@ export default function useChatSocket(
     });
 
     clientSocket.emit("endUserConnect", { endUserId: myEndUserId });
-    // Join the conversation
-    // clientSocket.emit("joinConversation", { conversationId });
 
     // Listen for new messages
     const handleSendMessage = (message: Message) => {
@@ -44,6 +42,7 @@ export default function useChatSocket(
         unreadConversationStore.addUnreadConversationId(message.conversationId);
       }
     };
+
     clientSocket.on("sendMessage", handleSendMessage);
 
     clientSocket.on("seenMessage", ({ _id }: { _id: string }) => {

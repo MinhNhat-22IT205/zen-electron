@@ -11,6 +11,7 @@ import { EndUser } from "@/src/shared/types/enduser.type";
 import { useUnreadConversationStore } from "@/src/shared/libs/zustand/unread-conversation.zustand";
 import { useEffect } from "react";
 import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
+import { useActiveUserIdStore } from "@/src/shared/libs/zustand/active-user.zustand";
 
 type ConversationItemProps = {
   conversation: Conversation;
@@ -20,11 +21,15 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
   const unreadConversationIds = useUnreadConversationStore(
     (state) => state.unreadConversationIds,
   );
+  const activeUserIds = useActiveUserIdStore((state) => state.activeUserIds);
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
   const otherEndUser = conversation.endUserIds.find(
     (endUser) => endUser._id !== myEndUserId,
   );
   const { id } = useParams();
+  useEffect(() => {
+    console.log("activeUserIds", activeUserIds);
+  }, [activeUserIds]);
   return (
     <div
       className="p-2 w-full"
@@ -45,11 +50,20 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
         </Avatar>
 
         <div
-          className={`flex flex-col items-start justify-center ${!!unreadConversationIds.find((id) => id == conversation._id) && "font-bold"}`}
+          className={`flex flex-1 flex-col items-start justify-center ${!!unreadConversationIds.find((id) => id == conversation._id) && "font-bold"}`}
         >
           <p>{otherEndUser?.username}</p>
+          {/* IMPLEMENT LATER */}
           {/* <p className="text-gray-500 truncate">Last Message</p> */}
         </div>
+        <div
+          className={`w-2 h-2 rounded-full ${
+            activeUserIds.length > 0 &&
+            activeUserIds.find((id: string) => id == otherEndUser?._id)
+              ? "bg-green-500"
+              : "bg-gray-500"
+          }`}
+        />
       </div>
     </div>
   );
