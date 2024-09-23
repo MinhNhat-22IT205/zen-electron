@@ -21,6 +21,7 @@ const AddFeedButton = () => {
             open();
           }
         }}
+        close={close}
       />
     </>
   );

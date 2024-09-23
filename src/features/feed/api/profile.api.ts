@@ -12,33 +12,23 @@ const editProfileInfo = async (values: ztEditProfileInputs) => {
     try {
       const formData = new FormData();
       formData.append("file", values.avatar);
-      const result1 = await http.patch<EndUser>(
-        EDIT_PROFILE_AVATAR_API_ENDPOINT,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      await http.patch<EndUser>(EDIT_PROFILE_AVATAR_API_ENDPOINT, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-      );
-      const result2 = await http.patch<EndUser>(
-        EDIT_PROFILE_INFO_API_ENDPOINT,
-        { username: values.username, description: values.description },
-      );
-      return result2.data;
+      });
     } catch (error) {
       return error.response.data;
     }
-  } else {
-    try {
-      const result = await http.patch<EndUser>(
-        EDIT_PROFILE_INFO_API_ENDPOINT,
-        values,
-      );
-      return result.data;
-    } catch (error) {
-      return error.response.data;
-    }
+  }
+  try {
+    const result = await http.patch<EndUser>(EDIT_PROFILE_INFO_API_ENDPOINT, {
+      username: values.username,
+      description: values.description,
+    });
+    return result.data;
+  } catch (error) {
+    return error.response.data;
   }
 };
 export { editProfileInfo };

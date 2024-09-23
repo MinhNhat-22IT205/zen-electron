@@ -34,9 +34,10 @@ import { addFeed } from "../api/feed.api";
 
 type AddFeedDialogProps = {
   isOpen: boolean;
+  close: () => void;
   onChange: (isOpen: boolean) => void;
 };
-const AddFeedDialog = ({ isOpen, onChange }: AddFeedDialogProps) => {
+const AddFeedDialog = ({ isOpen, onChange, close }: AddFeedDialogProps) => {
   const navigate = useNavigate();
   const [previews, setPreviews] = useState<string[]>([]);
 
@@ -51,6 +52,7 @@ const AddFeedDialog = ({ isOpen, onChange }: AddFeedDialogProps) => {
 
   const onSubmit = async (values: ztAddPostInputs) => {
     await addFeed(values);
+    close();
   };
 
   return (

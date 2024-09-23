@@ -22,13 +22,16 @@ const FeedList = () => {
     isRefreshing,
     error,
     isReachingEnd,
+    refreshPosts,
   } = useFetchRecommendationPosts();
 
   if (error) return <div>Error loading feeds: {error.message}</div>;
   return (
     <>
       <div className="flex justify-between items-center">
-        <Heading>Feeds</Heading>
+        <Heading>
+          <button onClick={refreshPosts}>Feeds</button>
+        </Heading>
         <Tabs defaultValue="popular" className="">
           <TabsList>
             <TabsTrigger value="popular">Popular</TabsTrigger>
