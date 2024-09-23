@@ -15,6 +15,7 @@ const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 1067,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,
@@ -44,6 +45,7 @@ app.on(
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
+  createWindow();
   createWindow();
 });
 
