@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/src/shared/components/shadcn-ui/dialog";
+import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
 import { EndUser } from "@/src/shared/types/enduser.type";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -39,7 +40,10 @@ const CallRequestDialog = ({
           <DialogTitle>{sender?.username} wants to call you</DialogTitle>
         </DialogHeader>
         <Avatar>
-          <AvatarImage src={sender?.avatar} alt="User Avatar" />
+          <AvatarImage
+            src={IMAGE_BASE_URL + sender?.avatar}
+            alt="User Avatar"
+          />
           <AvatarFallback>SC</AvatarFallback>
         </Avatar>
         <DialogFooter>

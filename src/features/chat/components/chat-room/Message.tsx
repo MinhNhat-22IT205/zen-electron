@@ -55,7 +55,7 @@ const Message = ({ message, seenMessage }: MessageProps) => {
       )}
       <div
         onClick={toggle}
-        className={`px-2.5 py-1.5 rounded-xl ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
+        className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
       >
         {message.content}
       </div>
