@@ -77,7 +77,7 @@ const MessageList = () => {
         </div>
       </ScrollArea>
       {/* Chat Input */}
-      <div className="flex px-2">
+      <div className="flex px-2 py-2">
         <Input
           className="focus:!outline-none focus-visible:!ring-0 flex-1"
           type="text"

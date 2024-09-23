@@ -13,11 +13,6 @@ const ChatPage = () => {
 
   return (
     <div className="h-screen w-full flex flex-col ">
-      <div className="border-b border-gray-200">
-        <Button variant="link" onClick={() => navigate("/feeds")}>
-          <TriangleLeftIcon className="w-4 h-4" /> Back
-        </Button>
-      </div>
       <div className="flex w-full h-full flex-1">
         <div className="w-64 h-full bg-white border border-gray-200">
           <ConversationList />

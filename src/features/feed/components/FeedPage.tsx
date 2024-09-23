@@ -6,13 +6,13 @@ import RightSidebar from "./RightSidebar";
 
 const FeedPage = () => {
   return (
-    <div>
-      <div className="flex justify-between items-center">
+    <>
+      <div className="flex w-full justify-between items-center">
         <FeedSearch />
         <AddFeedButton />
       </div>
       <FeedList />
-    </div>
+    </>
   );
 };
 

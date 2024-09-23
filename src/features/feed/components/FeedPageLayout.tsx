@@ -5,7 +5,7 @@ import RightSidebar from "./RightSidebar";
 const FeedPageLayout = () => {
   return (
     <div className="flex h-screen w-full gap-4">
-      <div className=" bg-gray-100 overflow-y-auto no-scrollbar py-4">
+      <div className=" bg-gray-100 overflow-y-auto no-scrollbar py-4 flex-1">
         <Outlet />
       </div>
       <RightSidebar />
