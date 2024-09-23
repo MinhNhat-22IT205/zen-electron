@@ -14,7 +14,10 @@ const servers = {
 
 let localStream: MediaStream | null = null;
 
-let peerConnections: { [key: string]: RTCPeerConnection } = {};
+interface CustomRTCPeerConnection extends RTCPeerConnection {
+  pendingCandidates?: RTCIceCandidate[];
+}
+let peerConnections: { [key: string]: CustomRTCPeerConnection } = {};
 
 const useCallSocket = (clientSocket: Socket) => {
   const navigate = useNavigate();
@@ -115,6 +118,7 @@ const useCallSocket = (clientSocket: Socket) => {
                 "Remote description not set, cannot add ICE candidate, remoteuser:",
                 fromEndUserId,
               );
+              peerConnections[fromEndUserId].pendingCandidates.push(data);
               return;
             }
             try {
@@ -195,6 +199,7 @@ const useCallSocket = (clientSocket: Socket) => {
   const createPeerConnection = async (memberId: string) => {
     const peerConnection = new RTCPeerConnection(servers);
     peerConnections[memberId] = peerConnection;
+    peerConnections[memberId].pendingCandidates = [];
 
     const remoteStream = new MediaStream();
     const remoteVideo = document.createElement("video");
@@ -242,6 +247,12 @@ const useCallSocket = (clientSocket: Socket) => {
         });
       }
     };
+    // Add this handler to flush pending ICE candidates
+    peerConnection.oniceconnectionstatechange = () => {
+      if (peerConnection.iceConnectionState === "connected") {
+        flushIceCandidates(memberId);
+      }
+    };
   };
 
   const createAnswer = async (memberId: string, offer: any) => {
@@ -261,12 +272,34 @@ const useCallSocket = (clientSocket: Socket) => {
       data: answer,
     });
     console.log("Answer sent to", memberId);
+    flushIceCandidates(memberId);
   };
 
   const addAnswer = async (memberId: string, answer: any) => {
     if (!peerConnections[memberId]?.currentRemoteDescription) {
       peerConnections[memberId]?.setRemoteDescription(answer);
       console.log("Addanswer: Remote description added for", memberId);
+      flushIceCandidates(memberId);
+    }
+  };
+
+  let flushIceCandidates = async (MemberId: string) => {
+    if (peerConnections[MemberId]) {
+      const pendingCandidates = peerConnections[MemberId].pendingCandidates;
+      if (pendingCandidates && pendingCandidates.length > 0) {
+        console.log(
+          `Flushing ${pendingCandidates.length} buffered ICE candidates`,
+        );
+        for (let candidate of pendingCandidates) {
+          try {
+            await peerConnections[MemberId].addIceCandidate(candidate);
+          } catch (error) {
+            console.error("Error adding buffered ICE candidate:", error);
+          }
+        }
+        // Clear the buffer after flushing
+        peerConnections[MemberId].pendingCandidates = [];
+      }
     }
   };
 
