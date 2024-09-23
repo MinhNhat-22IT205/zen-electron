@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Message as MessageType } from "@/src/shared/types/message.type";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useDisclosure } from "@/src/shared/hooks/use-disclosure";
+import { formatMessageTimestamp } from "@/src/shared/helpers/format-message-date";
 
 type MessageProps = {
   message: MessageType;
@@ -46,11 +47,7 @@ const Message = ({ message, seenMessage }: MessageProps) => {
     >
       {isOpen && (
         <div className="flex justify-end text-sm text-gray-500">
-          {new Date(message.createdAt).toLocaleString("en-US", {
-            hour: "numeric",
-            minute: "numeric",
-            weekday: "long",
-          })}
+          {formatMessageTimestamp(new Date(message.createdAt))}
         </div>
       )}
       <div
