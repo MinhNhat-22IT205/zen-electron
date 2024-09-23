@@ -34,7 +34,6 @@ const useOutsideListenerSocket = (clientSocket: Socket) => {
     clientSocket.on(
       "activeList",
       ({ activeList }: { activeList: string[] }) => {
-        console.log("activeList", activeList);
         activeUserIdStore.setActiveUserIds(activeList);
       },
     );

@@ -27,9 +27,6 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
     (endUser) => endUser._id !== myEndUserId,
   );
   const { id } = useParams();
-  useEffect(() => {
-    console.log("activeUserIds", activeUserIds);
-  }, [activeUserIds]);
   return (
     <div
       className="p-2 w-full"
