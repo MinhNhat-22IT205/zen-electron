@@ -161,10 +161,14 @@ const useCallSocket = (clientSocket: Socket) => {
           endUserId: myEndUser._id,
         });
       }
-      localStream =
-        await navigator.mediaDevices.getUserMedia(media_constraints);
-      (document.getElementById("user-1") as HTMLVideoElement).srcObject =
-        localStream;
+      try {
+        localStream =
+          await navigator.mediaDevices.getUserMedia(media_constraints);
+        (document.getElementById("user-1") as HTMLVideoElement).srcObject =
+          localStream;
+      } catch (error) {
+        console.error("Error accessing media devices.", error);
+      }
     })();
 
     return () => {
