@@ -1,8 +1,8 @@
 import React from "react";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import AppLayout from "./AppLayout";
-import FeedPage from "../features/feed/components/FeedPage";
-import FeedPageLayout from "../features/feed/components/FeedPageLayout";
+import FeedPage from "../features/newsfeed/components/FeedPage";
+import FeedPageLayout from "../features/newsfeed/components/FeedPageLayout";
 import ChatPage from "../features/chat/components/ChatPage";
 import ChatRoom from "../features/chat/components/chat-room/ChatRoom";
 import LoginForm from "../features/authentication/components/LoginForm";
@@ -12,7 +12,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import SearchPage from "../features/search/components/SearchPage";
 import CreateConversation from "../features/chat/components/conversation/CreateConversation";
 import CallRoom from "../features/chat/components/call/CallRoom";
-import UserProfilePage from "../features/feed/components/user-profile/UserProfilePage";
+import UserProfilePage from "../features/user-profile/components/UserProfilePage";
 
 const AppRoutes = () => {
   return (

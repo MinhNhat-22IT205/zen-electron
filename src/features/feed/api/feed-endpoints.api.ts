@@ -1,3 +1,0 @@
-const GET_FEED_API_ENDPOINT = "/posts";
-const ADD_FEED_API_ENDPOINT = "/post";
-export { GET_FEED_API_ENDPOINT, ADD_FEED_API_ENDPOINT };

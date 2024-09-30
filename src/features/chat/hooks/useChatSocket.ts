@@ -59,8 +59,6 @@ export default function useChatSocket(
       openCallRequestDialog();
     });
 
-    clientSocket.emit("requestCanceled", { conversationId });
-
     // Cleanup: Leave the room and remove the listener on unmount or when conversationId changes
     return () => {
       clientSocket.emit("leaveConversation", { conversationId });

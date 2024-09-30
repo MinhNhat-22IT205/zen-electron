@@ -47,6 +47,7 @@ app.on(
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   createWindow("persist:window1");
+  createWindow("persist:window2");
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
