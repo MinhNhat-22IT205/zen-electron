@@ -52,16 +52,30 @@ const MessageList = () => {
     setCallingConversationId,
   } = useRequestCallDialog();
 
-  const { emitMessage, denyCall, seenMessage } = useChatSocket(
-    id,
-    addMessageToUI,
+  // const { emitMessage, denyCall, seenMessage } = useChatSocket(
+  //   id,
+  //   addMessageToUI,
+  //   clientSocket,
+  //   setSender,
+  //   open,
+  //   setCallingConversationId,
+  //   callingConversationId,
+  //   setSeen,
+  // );
+  const { emitMessage, denyCall, seenMessage } = useChatSocket({
+    conversationId: id,
     clientSocket,
-    setSender,
-    open,
-    setCallingConversationId,
-    callingConversationId,
-    setSeen,
-  );
+    uiControl: {
+      addMessageToUI,
+      setSeenToUI: setSeen,
+    },
+    callDialogControl: {
+      setCaller: setSender,
+      openCallRequestDialog: open,
+      setCallingConversationId,
+      callingConversationId,
+    },
+  });
 
   return (
     <>

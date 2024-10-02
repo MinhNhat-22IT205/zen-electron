@@ -1,10 +1,9 @@
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
-import React, { useEffect } from "react";
-import { set } from "react-hook-form";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
-const servers = {
+const ICE_SERVERS = {
   iceServers: [
     {
       urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"],
@@ -12,340 +11,332 @@ const servers = {
   ],
 };
 
-let localStream: MediaStream | null = null;
+const MEDIA_CONSTRAINTS = {
+  video: {
+    width: { min: 640, ideal: 1920, max: 1920 },
+    height: { min: 480, ideal: 1080, max: 1080 },
+  },
+  audio: true,
+};
 
 interface CustomRTCPeerConnection extends RTCPeerConnection {
   pendingCandidates?: RTCIceCandidate[];
 }
-let peerConnections: { [key: string]: CustomRTCPeerConnection } = {};
 
 const useCallSocket = (clientSocket: Socket) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const conversationId = searchParams.get("conversationId");
-  const isSenderString = searchParams.get("isSender");
-  const isSender = isSenderString === "true";
+  const isSender = searchParams.get("isSender") === "true";
   const myEndUser = useAuthStore((state) => state.endUser);
 
-  const media_constraints = {
-    video: {
-      width: { min: 640, ideal: 1920, max: 1920 },
-      height: { min: 480, ideal: 1080, max: 1080 },
-    },
-    audio: true,
+  let localStream: MediaStream | null = null;
+  let peerConnections: { [key: string]: CustomRTCPeerConnection } = {};
+
+  const reset = () => {
+    console.log("Resetting connections and streams");
+    cleanupLocalStream();
+    cleanupPeerConnections();
+    removeRemoteVideos();
+    removeSocketListeners();
+  };
+  useEffect(() => {
+    const initializeCall = async () => {
+      reset();
+      setupSocketListeners();
+      emitInitialRequest();
+      await setupLocalStream();
+    };
+
+    initializeCall();
+
+    return reset;
+  }, []);
+
+  const cleanupLocalStream = () => {
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      localStream = null;
+    }
   };
 
-  useEffect(() => {
-    const reset = () => {
-      console.log("Resetting connections and streams");
+  const cleanupPeerConnections = () => {
+    Object.values(peerConnections).forEach((connection) => connection.close());
+    peerConnections = {};
+  };
 
-      // Stop and reset localStream
-      if (localStream) {
-        localStream.getTracks().forEach((track) => track.stop());
-        localStream = null;
-      }
-      localStream = null;
-
-      // Close and reset all peerConnections
-      Object.keys(peerConnections).forEach((memberId) => {
-        peerConnections[memberId].close();
-        delete peerConnections[memberId];
-      });
-
-      // Remove any leftover video elements (if any)
-      const videoContainer = document.getElementById("videos");
-      if (videoContainer) {
-        Array.from(videoContainer.children).forEach((child) => {
-          if (child.id !== "user-1") {
-            videoContainer.removeChild(child);
-          }
-        });
-      }
-
-      // Reset socket listeners if necessary
-      clientSocket.off("requestDeny");
-      clientSocket.off("requestAccept");
-      clientSocket.off("memberLeft");
-      clientSocket.off("callMessageFromPeer");
-    };
-    (async () => {
-      reset();
-      clientSocket.on("connect", () => {
-        clientSocket.emit("endUserConnect", { endUserId: myEndUser._id });
-
-        console.log("Connected ");
-      });
-
-      clientSocket.on("connect_error", (err) => {
-        console.error("Connection error: ", err);
-      });
-
-      clientSocket.on("disconnect", () => {
-        console.log("Disconnected");
-      });
-
-      const handleUserLeft = ({ fromEndUserId }: { fromEndUserId: string }) => {
-        document.getElementById(fromEndUserId).style.display = "none";
-        if (peerConnections[fromEndUserId]) {
-          peerConnections[fromEndUserId].close();
-          delete peerConnections[fromEndUserId];
+  const removeRemoteVideos = () => {
+    const videoContainer = document.getElementById("videos");
+    if (videoContainer) {
+      Array.from(videoContainer.children).forEach((child) => {
+        if (child.id !== "user-1") {
+          videoContainer.removeChild(child);
         }
-      };
-      const handleMessageFromPeer = async ({
-        type,
-        fromEndUserId,
-        data,
-      }: {
-        type: "offer" | "candidate" | "answer";
-        fromEndUserId: string;
-        toEndUserId: string;
-        data: any;
-      }) => {
-        console.log("Message from peer type", type);
-        if (type === "offer") {
-          //data:offer
-          createAnswer(fromEndUserId, data);
-        }
-        if (type === "answer") {
-          //data:answer
-          addAnswer(fromEndUserId, data);
-        }
+      });
+    }
+  };
 
-        if (type === "candidate") {
-          if (peerConnections[fromEndUserId]) {
-            if (!peerConnections[fromEndUserId].remoteDescription) {
-              console.warn(
-                "Remote description not set, cannot add ICE candidate, remoteuser:",
-                fromEndUserId,
-              );
-              peerConnections[fromEndUserId].pendingCandidates.push(data);
-              return;
-            }
-            try {
-              await peerConnections[fromEndUserId].addIceCandidate(
-                data as RTCIceCandidate,
-              );
-            } catch (error) {
-              console.error("Error adding ICE candidate:", error);
-            }
-          }
-        }
-      };
+  const removeSocketListeners = () => {
+    clientSocket.off("requestDeny");
+    clientSocket.off("requestAccept");
+    clientSocket.off("memberLeft");
+    clientSocket.off("callMessageFromPeer");
+  };
 
-      const handleRequestAccepted = ({
-        endUserId: joinerId,
-      }: {
-        endUserId: string;
-      }) => {
-        console.log("Request accepted", joinerId);
-        createOffer(joinerId);
-      };
+  const setupSocketListeners = () => {
+    clientSocket.on("connect", handleConnect);
+    clientSocket.on("connect_error", handleConnectError);
+    clientSocket.on("disconnect", handleDisconnect);
+    clientSocket.on("requestDeny", handleRequestDenied);
+    clientSocket.on("requestAccept", handleRequestAccepted);
+    clientSocket.on("memberLeft", handleUserLeft);
+    clientSocket.on("callMessageFromPeer", handleMessageFromPeer);
+  };
 
-      const handleRequestDenied = (data: any) => {
-        reset();
-        navigate("/conversations/" + conversationId);
-      };
-      clientSocket.on("requestDeny", handleRequestDenied);
+  const handleConnect = () => {
+    clientSocket.emit("endUserConnect", { endUserId: myEndUser._id });
+    console.log("Connected");
+  };
 
-      // when user joined
-      clientSocket.on("requestAccept", handleRequestAccepted);
+  const handleConnectError = (err: Error) => {
+    console.error("Connection error:", err);
+  };
 
-      clientSocket.on("memberLeft", handleUserLeft);
+  const handleDisconnect = () => {
+    console.log("Disconnected");
+  };
 
-      clientSocket.on("callMessageFromPeer", handleMessageFromPeer);
+  const handleRequestDenied = () => {
+    reset();
+    navigate(`/conversations/${conversationId}`);
+  };
 
-      if (isSender) {
-        clientSocket.emit("requestCall", {
-          conversationId,
-          endUserId: myEndUser._id,
-        });
-      } else {
-        clientSocket.emit("requestAccept", {
-          conversationId: conversationId,
-          endUserId: myEndUser._id,
-        });
-      }
-      try {
-        localStream =
-          await navigator.mediaDevices.getUserMedia(media_constraints);
-        (document.getElementById("user-1") as HTMLVideoElement).srcObject =
-          localStream;
-      } catch (error) {
-        console.error("Error accessing media devices.", error);
-      }
-    })();
+  const handleRequestAccepted = ({
+    endUserId: joinerId,
+  }: {
+    endUserId: string;
+  }) => {
+    console.log("Request accepted", joinerId);
+    createOffer(joinerId);
+  };
 
-    return () => {
-      reset();
-    };
-  }, []);
+  const handleUserLeft = ({ fromEndUserId }: { fromEndUserId: string }) => {
+    const remoteVideo = document.getElementById(fromEndUserId);
+    if (remoteVideo) remoteVideo.style.display = "none";
+    if (peerConnections[fromEndUserId]) {
+      peerConnections[fromEndUserId].close();
+      delete peerConnections[fromEndUserId];
+    }
+  };
+
+  const handleMessageFromPeer = async ({
+    type,
+    fromEndUserId,
+    data,
+  }: {
+    type: "offer" | "candidate" | "answer";
+    fromEndUserId: string;
+    toEndUserId: string;
+    data: any;
+  }) => {
+    console.log("Message from peer type", type);
+    switch (type) {
+      case "offer":
+        await createAnswer(fromEndUserId, data);
+        break;
+      case "answer":
+        await addAnswer(fromEndUserId, data);
+        break;
+      case "candidate":
+        await handleIceCandidate(fromEndUserId, data);
+        break;
+    }
+  };
+
+  const emitInitialRequest = () => {
+    const requestType = isSender ? "requestCall" : "requestAccept";
+    clientSocket.emit(requestType, {
+      conversationId,
+      endUserId: myEndUser._id,
+    });
+  };
+
+  const setupLocalStream = async () => {
+    try {
+      localStream =
+        await navigator.mediaDevices.getUserMedia(MEDIA_CONSTRAINTS);
+      const localVideo = document.getElementById("user-1") as HTMLVideoElement;
+      if (localVideo) localVideo.srcObject = localStream;
+    } catch (error) {
+      console.error("Error accessing media devices.", error);
+    }
+  };
 
   const createOffer = async (joinerId: string) => {
     await createPeerConnection(joinerId);
-
-    console.log("Peer connection", peerConnections[joinerId], peerConnections);
-    let offer = await peerConnections[joinerId]?.createOffer();
+    const offer = await peerConnections[joinerId]?.createOffer();
     await peerConnections[joinerId]?.setLocalDescription(offer);
 
-    clientSocket.emit("callMessageFromPeer", {
-      type: "offer",
-      fromEndUserId: myEndUser._id,
-      toEndUserId: joinerId,
-      data: offer,
-    });
-    console.log("Offer sent to", joinerId);
+    emitCallMessage("offer", joinerId, offer);
   };
 
   const createPeerConnection = async (memberId: string) => {
-    const peerConnection = new RTCPeerConnection(servers);
+    const peerConnection = new RTCPeerConnection(ICE_SERVERS);
     peerConnections[memberId] = peerConnection;
     peerConnections[memberId].pendingCandidates = [];
 
+    setupRemoteStream(memberId);
+    await addLocalStreamTracks(peerConnection);
+    setupPeerConnectionListeners(peerConnection, memberId);
+  };
+
+  const setupRemoteStream = (memberId: string) => {
     const remoteStream = new MediaStream();
     const remoteVideo = document.createElement("video");
     remoteVideo.srcObject = remoteStream;
     remoteVideo.autoplay = true;
     remoteVideo.classList.add("video-player");
     remoteVideo.style.display = "block";
-    remoteVideo.setAttribute("id", memberId);
-    document.getElementById("videos").append(remoteVideo);
+    remoteVideo.id = memberId;
+    document.getElementById("videos")?.append(remoteVideo);
+    document.getElementById("user-1")?.classList.add("smallFrame");
+  };
 
-    document.getElementById("user-1").classList.add("smallFrame");
-    console.log("Local stream", localStream);
+  const addLocalStreamTracks = async (peerConnection: RTCPeerConnection) => {
     if (!localStream) {
       localStream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
-      (document.getElementById("user-1") as HTMLVideoElement).srcObject =
-        localStream;
+      const localVideo = document.getElementById("user-1") as HTMLVideoElement;
+      if (localVideo) localVideo.srcObject = localStream;
     }
-    localStream?.getTracks().forEach((track) => {
-      console.log(`Adding track: ${track.kind}`);
-      peerConnection.addTrack(track, localStream);
+    localStream.getTracks().forEach((track) => {
+      peerConnection.addTrack(track, localStream!);
     });
+  };
 
-    peerConnection.ontrack = (event) => {
-      event.streams[0].getTracks().forEach((track) => {
-        if (track.kind === "audio") {
-          console.log("Audio track received");
-        } else if (track.kind === "video") {
-          console.log("Video track received");
-        }
-        remoteStream.addTrack(track);
-      });
-    };
+  const setupPeerConnectionListeners = (
+    peerConnection: RTCPeerConnection,
+    memberId: string,
+  ) => {
+    peerConnection.ontrack = handleTrack(memberId);
+    peerConnection.onicecandidate = handleIceCandidateEvent(memberId);
+    peerConnection.oniceconnectionstatechange =
+      handleIceConnectionStateChange(memberId);
+  };
 
-    peerConnection.onicecandidate = async (event) => {
+  const handleTrack = (memberId: string) => (event: RTCTrackEvent) => {
+    const remoteStream = new MediaStream();
+    event.streams[0].getTracks().forEach((track) => {
+      remoteStream.addTrack(track);
+    });
+    const remoteVideo = document.getElementById(memberId) as HTMLVideoElement;
+    if (remoteVideo) remoteVideo.srcObject = remoteStream;
+  };
+
+  const handleIceCandidateEvent =
+    (memberId: string) => (event: RTCPeerConnectionIceEvent) => {
       if (event.candidate) {
-        console.log("Sending Ice candidate", new Date().getTime());
-        clientSocket.emit("callMessageFromPeer", {
-          type: "candidate",
-          fromEndUserId: myEndUser._id,
-          toEndUserId: memberId,
-          data: event.candidate,
-        });
+        emitCallMessage("candidate", memberId, event.candidate);
       }
     };
-    // Add this handler to flush pending ICE candidates
-    peerConnection.oniceconnectionstatechange = () => {
-      if (peerConnection.iceConnectionState === "connected") {
-        flushIceCandidates(memberId);
-      }
-    };
-  };
 
-  const createAnswer = async (memberId: string, offer: any) => {
-    await createPeerConnection(memberId);
-
-    await peerConnections[memberId]?.setRemoteDescription(offer);
-    console.log("Remote description set for", memberId);
-
-    console.log("second localDes");
-    let answer = await peerConnections[memberId]?.createAnswer();
-    await peerConnections[memberId]?.setLocalDescription(answer);
-
-    clientSocket.emit("callMessageFromPeer", {
-      type: "answer",
-      fromEndUserId: myEndUser._id,
-      toEndUserId: memberId,
-      data: answer,
-    });
-    console.log("Answer sent to", memberId);
-    flushIceCandidates(memberId);
-  };
-
-  const addAnswer = async (memberId: string, answer: any) => {
-    if (!peerConnections[memberId]?.currentRemoteDescription) {
-      peerConnections[memberId]?.setRemoteDescription(answer);
-      console.log("Addanswer: Remote description added for", memberId);
+  const handleIceConnectionStateChange = (memberId: string) => () => {
+    if (peerConnections[memberId].iceConnectionState === "connected") {
       flushIceCandidates(memberId);
     }
   };
 
-  let flushIceCandidates = async (MemberId: string) => {
-    if (peerConnections[MemberId]) {
-      const pendingCandidates = peerConnections[MemberId].pendingCandidates;
-      if (pendingCandidates && pendingCandidates.length > 0) {
-        console.log(
-          `Flushing ${pendingCandidates.length} buffered ICE candidates`,
-        );
-        for (let candidate of pendingCandidates) {
-          try {
-            await peerConnections[MemberId].addIceCandidate(candidate);
-          } catch (error) {
-            console.error("Error adding buffered ICE candidate:", error);
-          }
-        }
-        // Clear the buffer after flushing
-        peerConnections[MemberId].pendingCandidates = [];
+  const createAnswer = async (
+    memberId: string,
+    offer: RTCSessionDescriptionInit,
+  ) => {
+    await createPeerConnection(memberId);
+    await peerConnections[memberId]?.setRemoteDescription(offer);
+    const answer = await peerConnections[memberId]?.createAnswer();
+    await peerConnections[memberId]?.setLocalDescription(answer);
+
+    emitCallMessage("answer", memberId, answer);
+    flushIceCandidates(memberId);
+  };
+
+  const addAnswer = async (
+    memberId: string,
+    answer: RTCSessionDescriptionInit,
+  ) => {
+    if (!peerConnections[memberId]?.currentRemoteDescription) {
+      await peerConnections[memberId]?.setRemoteDescription(answer);
+      flushIceCandidates(memberId);
+    }
+  };
+
+  const handleIceCandidate = async (
+    fromEndUserId: string,
+    candidate: RTCIceCandidate,
+  ) => {
+    const peerConnection = peerConnections[fromEndUserId];
+    if (peerConnection) {
+      if (!peerConnection.remoteDescription) {
+        peerConnection.pendingCandidates?.push(candidate);
+        return;
+      }
+      try {
+        await peerConnection.addIceCandidate(candidate);
+      } catch (error) {
+        console.error("Error adding ICE candidate:", error);
       }
     }
   };
 
-  const leaveChannel = async () => {
-    Object.keys(peerConnections).forEach((memberId) => {
-      peerConnections[memberId].close();
+  const flushIceCandidates = async (memberId: string) => {
+    const peerConnection = peerConnections[memberId];
+    if (peerConnection && peerConnection.pendingCandidates) {
+      for (const candidate of peerConnection.pendingCandidates) {
+        try {
+          await peerConnection.addIceCandidate(candidate);
+        } catch (error) {
+          console.error("Error adding buffered ICE candidate:", error);
+        }
+      }
+      peerConnection.pendingCandidates = [];
+    }
+  };
+
+  const emitCallMessage = (type: string, toEndUserId: string, data: any) => {
+    clientSocket.emit("callMessageFromPeer", {
+      type,
+      fromEndUserId: myEndUser._id,
+      toEndUserId,
+      data,
     });
+  };
+
+  const leaveChannel = () => {
+    cleanupPeerConnections();
     clientSocket.emit("memberLeft", {
       conversationId,
       fromEndUserId: myEndUser._id,
     });
-    peerConnections = {};
-    navigate("/conversations/" + conversationId);
+    navigate(`/conversations/${conversationId}`);
   };
 
-  const toggleCamera = async () => {
-    const videoTrack = localStream
-      .getTracks()
-      .find((track) => track.kind === "video");
-
-    if (videoTrack.enabled) {
-      videoTrack.enabled = false;
-      document.getElementById("camera-btn").style.backgroundColor =
-        "rgb(255, 80, 80)";
-    } else {
-      videoTrack.enabled = true;
-      document.getElementById("camera-btn").style.backgroundColor =
-        "rgb(179, 102, 249, .9)";
+  const toggleTrack = (kind: "video" | "audio") => {
+    const track = localStream?.getTracks().find((t) => t.kind === kind);
+    if (track) {
+      track.enabled = !track.enabled;
+      const btnId = kind === "video" ? "camera-btn" : "mic-btn";
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.style.backgroundColor = track.enabled
+          ? "rgb(179, 102, 249, .9)"
+          : "rgb(255, 80, 80)";
+      }
     }
   };
 
-  const toggleMic = async () => {
-    const audioTrack = localStream
-      .getTracks()
-      .find((track) => track.kind === "audio");
-
-    if (audioTrack.enabled) {
-      audioTrack.enabled = false;
-      document.getElementById("mic-btn").style.backgroundColor =
-        "rgb(255, 80, 80)";
-    } else {
-      audioTrack.enabled = true;
-      document.getElementById("mic-btn").style.backgroundColor =
-        "rgb(179, 102, 249, .9)";
-    }
-  };
+  const toggleCamera = () => toggleTrack("video");
+  const toggleMic = () => toggleTrack("audio");
 
   return { leaveChannel, toggleCamera, toggleMic };
 };

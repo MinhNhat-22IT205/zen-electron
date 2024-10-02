@@ -23,6 +23,14 @@ const ConversationList = () => {
     { refreshInterval: 1000 },
   );
 
+  useEffect(() => {
+    const hasLoadedConversations = !isLoading;
+    const hasEnterAConversation = !!id;
+    if (hasLoadedConversations && !hasEnterAConversation) {
+      navigate("/conversations/" + conversations[0]._id);
+    }
+  }, [isLoading, id]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
