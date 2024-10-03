@@ -20,28 +20,30 @@ import { useNavigate } from "react-router-dom";
 
 type CallRequestDialogProps = {
   isOpen: boolean;
-  onChange: (isOpen: boolean) => void;
+  open: () => void;
+  close: () => void;
   denyCall: () => void;
-  sender: EndUser;
+  caller: EndUser;
   callingConversationId: string;
 };
 const CallRequestDialog = ({
   isOpen,
-  onChange,
+  open,
+  close,
   denyCall,
-  sender,
+  caller,
   callingConversationId,
 }: CallRequestDialogProps) => {
   const navigate = useNavigate();
   return (
-    <Dialog open={isOpen} onOpenChange={onChange}>
+    <Dialog open={isOpen} onOpenChange={close}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{sender?.username} wants to call you</DialogTitle>
+          <DialogTitle>{caller?.username} wants to call you</DialogTitle>
         </DialogHeader>
         <Avatar>
           <AvatarImage
-            src={IMAGE_BASE_URL + sender?.avatar}
+            src={IMAGE_BASE_URL + caller?.avatar}
             alt="User Avatar"
           />
           <AvatarFallback>SC</AvatarFallback>
@@ -51,6 +53,7 @@ const CallRequestDialog = ({
             variant="default"
             className="bg-green-300 text-white"
             onClick={() => {
+              close();
               navigate(
                 `/call-room?conversationId=${callingConversationId}&isSender=false`,
               );

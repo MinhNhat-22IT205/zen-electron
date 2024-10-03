@@ -1,54 +1,65 @@
 import { useActiveUserIdStore } from "@/src/shared/libs/zustand/active-user.zustand";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
-import { useUnreadConversationStore } from "@/src/shared/libs/zustand/unread-conversation.zustand";
-import { Message } from "@/src/shared/types/message.type";
-import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useCallRequestDialogStore } from "@/src/shared/libs/zustand/call-request-dialog.zustand";
+import { useSocketStore } from "@/src/shared/libs/zustand/socket-instance.zustand";
+import { EndUser } from "@/src/shared/types/enduser.type";
+import { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
 const useOutsideListenerSocket = (clientSocket: Socket) => {
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
-  const { id: conversationId } = useParams();
-  const unreadConversationStore = useUnreadConversationStore((state) => state);
-  const activeUserIdStore = useActiveUserIdStore((state) => state);
+  const activeUserIdStore = useActiveUserIdStore();
+  const callDialogStore = useCallRequestDialogStore();
+  const { setSocket } = useSocketStore();
+
   useEffect(() => {
-    // Only add listeners if a conversation ID exists
-    clientSocket.on("connect", () => {
-      console.log("Connected outside");
-    });
-
-    clientSocket.on("connect_error", (err) => {
-      console.error("Connection error: ", err);
-    });
-
-    clientSocket.on("disconnect", () => {
-      console.log("Disconnected");
-    });
-
+    setSocket(clientSocket);
     clientSocket.emit("endUserConnect", { endUserId: myEndUserId });
 
-    setInterval(() => {
+    const activeListInterval = setInterval(() => {
       clientSocket.emit("activeList", {});
     }, 5000);
 
-    clientSocket.on(
-      "activeList",
-      ({ activeList }: { activeList: string[] }) => {
-        activeUserIdStore.setActiveUserIds(activeList);
-      },
-    );
-
-    // Listen for new messages
-    const handleUnreadMessage = (message: Message) => {
-      if (message.conversationId !== conversationId) {
-        unreadConversationStore.addUnreadConversationId(message.conversationId);
-      }
+    const handleRequestCall = ({
+      conversationId,
+      sender,
+    }: {
+      conversationId: string;
+      sender: EndUser;
+    }) => {
+      callDialogStore.setCaller(sender);
+      callDialogStore.setCallingConversationId(conversationId);
+      callDialogStore.open();
     };
-    clientSocket.on("sendMessage", handleUnreadMessage);
 
-    return () => {};
-  }, [clientSocket]);
-  return {};
+    const handleActiveList = ({ activeList }: { activeList: string[] }) => {
+      activeUserIdStore.setActiveUserIds(activeList);
+    };
+
+    clientSocket.on("activeList", handleActiveList);
+    clientSocket.on("requestCall", handleRequestCall);
+
+    return () => {
+      clearInterval(activeListInterval);
+      clientSocket.off("activeList", handleActiveList);
+      clientSocket.off("requestCall", handleRequestCall);
+    };
+  }, [
+    clientSocket,
+    myEndUserId,
+    callDialogStore,
+    activeUserIdStore,
+    setSocket,
+  ]);
+
+  const denyCall = () => {
+    clientSocket.emit("requestDeny", {
+      conversationId: callDialogStore.callingConversationId,
+      fromEndUserId: myEndUserId,
+    });
+  };
+
+  return { denyCall };
 };
 
 export default useOutsideListenerSocket;

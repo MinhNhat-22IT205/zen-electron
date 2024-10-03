@@ -8,11 +8,9 @@ import {
   SpeakerModerateIcon,
 } from "@radix-ui/react-icons";
 
-const clientSocket = io(SERVER_SOCKET_URL);
-
 const CallRoom = () => {
   const location = useLocation();
-  const { leaveChannel, toggleCamera, toggleMic } = useCallSocket(clientSocket);
+  const { leaveChannel, toggleCamera, toggleMic } = useCallSocket();
   return (
     //newly initialize page whenever got redirected into
     <div key={location.pathname}>

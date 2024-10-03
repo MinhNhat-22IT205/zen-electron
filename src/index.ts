@@ -48,6 +48,7 @@ app.on(
 app.on("ready", () => {
   createWindow("persist:window1");
   createWindow("persist:window2");
+  createWindow("persist:window3");
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

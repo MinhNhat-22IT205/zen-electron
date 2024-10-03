@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
+import { useSocketStore } from "@/src/shared/libs/zustand/socket-instance.zustand";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Socket } from "socket.io-client";
@@ -23,12 +24,13 @@ interface CustomRTCPeerConnection extends RTCPeerConnection {
   pendingCandidates?: RTCIceCandidate[];
 }
 
-const useCallSocket = (clientSocket: Socket) => {
+const useCallSocket = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const conversationId = searchParams.get("conversationId");
   const isSender = searchParams.get("isSender") === "true";
   const myEndUser = useAuthStore((state) => state.endUser);
+  const { socket: clientSocket } = useSocketStore();
 
   let localStream: MediaStream | null = null;
   let peerConnections: { [key: string]: CustomRTCPeerConnection } = {};
@@ -41,6 +43,8 @@ const useCallSocket = (clientSocket: Socket) => {
     removeSocketListeners();
   };
   useEffect(() => {
+    if (!clientSocket) return;
+
     const initializeCall = async () => {
       reset();
       setupSocketListeners();
@@ -84,26 +88,10 @@ const useCallSocket = (clientSocket: Socket) => {
   };
 
   const setupSocketListeners = () => {
-    clientSocket.on("connect", handleConnect);
-    clientSocket.on("connect_error", handleConnectError);
-    clientSocket.on("disconnect", handleDisconnect);
     clientSocket.on("requestDeny", handleRequestDenied);
     clientSocket.on("requestAccept", handleRequestAccepted);
     clientSocket.on("memberLeft", handleUserLeft);
     clientSocket.on("callMessageFromPeer", handleMessageFromPeer);
-  };
-
-  const handleConnect = () => {
-    clientSocket.emit("endUserConnect", { endUserId: myEndUser._id });
-    console.log("Connected");
-  };
-
-  const handleConnectError = (err: Error) => {
-    console.error("Connection error:", err);
-  };
-
-  const handleDisconnect = () => {
-    console.log("Disconnected");
   };
 
   const handleRequestDenied = () => {
