@@ -1,4 +1,9 @@
 import {
+  ItemAction,
+  ItemInfo,
+  ListItemWithAvatar,
+} from "@/src/shared/components/ListItemWithAvatar";
+import {
   Avatar,
   AvatarFallback,
   AvatarImage,
@@ -17,25 +22,24 @@ type EnduserSearchItemProps = {
 
 const EnduserSearchItem = ({ endUser }: EnduserSearchItemProps) => {
   return (
-    <Card className="p-3">
-      <div className="flex justify-between space-x-4 w-full">
-        <Avatar>
-          <AvatarImage src={IMAGE_BASE_URL + endUser.avatar} />
-          <AvatarFallback>{endUser.username}</AvatarFallback>
-        </Avatar>
-        <div className="space-y-1 flex flex-col items-start w-full flex-1">
-          <h4 className="text-sm font-semibold">{endUser.username}</h4>
-          <p className="text-sm">{endUser.description}</p>
-          <div className="flex items-center pt-2">
-            <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />{" "}
-            <span className="text-xs text-muted-foreground">
-              {new Date(endUser.createdAt).toLocaleString("en-US", {
-                month: "long",
-                year: "numeric",
-              })}
-            </span>
-          </div>
+    <ListItemWithAvatar
+      avatarSrc={IMAGE_BASE_URL + endUser.avatar}
+      avatarFallback={endUser.username}
+    >
+      <ItemInfo>
+        <h4 className="text-sm font-semibold">{endUser.username}</h4>
+        <p className="text-sm">{endUser.description}</p>
+        <div className="flex items-center pt-2">
+          <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />{" "}
+          <span className="text-xs text-muted-foreground">
+            {new Date(endUser.createdAt).toLocaleString("en-US", {
+              month: "long",
+              year: "numeric",
+            })}
+          </span>
         </div>
+      </ItemInfo>
+      <ItemAction>
         <Button variant="secondary">
           <Link
             to={"/conversations/create-conversation?userId=" + endUser._id}
@@ -45,8 +49,8 @@ const EnduserSearchItem = ({ endUser }: EnduserSearchItemProps) => {
             <PaperPlaneIcon className="h-4 w-4 ml-2" />
           </Link>
         </Button>
-      </div>
-    </Card>
+      </ItemAction>
+    </ListItemWithAvatar>
   );
 };
 

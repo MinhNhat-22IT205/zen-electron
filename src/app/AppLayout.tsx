@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
-import LeftSidebar from "../shared/components/LeftSidebar";
+import LeftSidebar from "./LeftSidebar";
 
 const AppLayout = () => {
   return (

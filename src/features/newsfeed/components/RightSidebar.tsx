@@ -2,13 +2,22 @@ import Text from "../../../shared/components/shadcn-ui/text";
 import Heading from "../../../shared/components/shadcn-ui/heading";
 import React from "react";
 import { Button } from "../../../shared/components/shadcn-ui/button";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { PlusCircledIcon, PlusIcon } from "@radix-ui/react-icons";
+import { useNavigate } from "react-router-dom";
 
-const RightSidebar = () => {
+type RightSidebarProps = {
+  livestreamListComponent: React.ReactNode;
+  addLivestreamButtonComponent: React.ReactNode;
+};
+
+const RightSidebar = ({
+  livestreamListComponent,
+  addLivestreamButtonComponent,
+}: RightSidebarProps) => {
   return (
     <div className="h-full w-72 p-4 shadow-xl bg-white">
       {/* User Requests */}
-      <Heading>Friend requests</Heading>
+      <Heading>Join group requests</Heading>
       {/* <div className="flex items-center justify-center space-x-3 gap-2">
         <img
           className="w-12 h-12 rounded-full"
@@ -30,27 +39,13 @@ const RightSidebar = () => {
           </div>
         </div>
       </div> */}
-      <div className="h-40" />
+      <div className="h-20" />
       <div className="border-2 border-dashed mt-6 mb-4" />
-
-      {/* Navigation Links */}
-      <Heading>Suggestion for you</Heading>
-      {/* <div className="flex items-center justify-center space-x-3 gap-2">
-        <img
-          className="w-12 h-12 rounded-full"
-          src="https://via.placeholder.com/150"
-          alt="User profile"
-        />
-        <div>
-          <Text className="text-center font-bold">Katia Zuora</Text>
-          <Text className="text-center text-gray-500">
-            Tallahassee, Florida
-          </Text>
-        </div>
-        <Button variant="ghost" className="text-gray-500">
-          <PlusCircledIcon className="w-5 h-5" />
-        </Button>
-      </div> */}
+      <div className="flex items-center justify-between">
+        <Heading>Livestreams</Heading>
+        {addLivestreamButtonComponent}
+      </div>
+      {livestreamListComponent}
     </div>
   );
 };
