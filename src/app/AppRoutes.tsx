@@ -13,7 +13,9 @@ import SearchPage from "../features/search/components/SearchPage";
 import CreateConversation from "../features/chat/components/conversation/CreateConversation";
 import CallRoom from "../features/chat/components/call/CallRoom";
 import UserProfilePage from "../features/user-profile/components/UserProfilePage";
-
+import LivestreamRoom from "../features/livestream/components/stream/LivestreamRoom";
+import LivestreamList from "../features/livestream/components/LivestreamList";
+import AddLivestreamButton from "../features/livestream/components/add-livestream/AddLivestreamButton";
 const AppRoutes = () => {
   return (
     <>
@@ -36,7 +38,15 @@ const AppRoutes = () => {
             }
           >
             <Route index element={<Navigate to="/feeds" />} />
-            <Route path="feeds" element={<FeedPageLayout />}>
+            <Route
+              path="feeds"
+              element={
+                <FeedPageLayout
+                  livestreamListComponent={<LivestreamList />}
+                  addLivestreamButtonComponent={<AddLivestreamButton />}
+                />
+              }
+            >
               <Route index element={<FeedPage />} />
             </Route>
             <Route path="search" element={<SearchPage />} />
@@ -61,6 +71,9 @@ const AppRoutes = () => {
 
           {/* Call room */}
           <Route path="/call-room" element={<CallRoom />} />
+
+          {/* Livestream room */}
+          <Route path="/livestream/:id" element={<LivestreamRoom />} />
         </Routes>
       </HashRouter>
     </>

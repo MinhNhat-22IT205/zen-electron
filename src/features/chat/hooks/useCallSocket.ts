@@ -155,6 +155,7 @@ const useCallSocket = () => {
         await navigator.mediaDevices.getUserMedia(MEDIA_CONSTRAINTS);
       const localVideo = document.getElementById("user-1") as HTMLVideoElement;
       if (localVideo) localVideo.srcObject = localStream;
+      console.log("localStream", localStream);
     } catch (error) {
       console.error("Error accessing media devices.", error);
     }
