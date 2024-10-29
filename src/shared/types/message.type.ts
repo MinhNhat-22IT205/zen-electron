@@ -1,3 +1,5 @@
+import { EndUserMinimal } from "./enduser.type";
+
 type Message = {
   _id: string;
   endUserId: string;
@@ -7,4 +9,10 @@ type Message = {
   read: boolean;
   createdAt: Date;
 };
-export { Message };
+type LivestreamMessage = {
+  endUser: EndUserMinimal;
+  message: string;
+  liveStreamId: string;
+  createdAt: Date;
+};
+export { Message, LivestreamMessage };
