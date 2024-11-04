@@ -16,21 +16,33 @@ import {
 } from "@/src/shared/components/shadcn-ui/dialog";
 import { Input } from "@/src/shared/components/shadcn-ui/input";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
-import { EndUser } from "@/src/shared/types/enduser.type";
+import { EndUser, EndUserMinimal } from "@/src/shared/types/enduser.type";
 import {
   DotsHorizontalIcon,
   MagnifyingGlassIcon,
   PlusIcon,
 } from "@radix-ui/react-icons";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import useSWR from "swr";
+import { addMembersToConversation } from "../../api/conversation.api";
 
-const AddRoomMemberDialog = () => {
+type AddRoomMemberDialogProps = {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  currentRoomMembers: EndUserMinimal[];
+};
+const AddRoomMemberDialog = ({
+  isOpen,
+  setIsOpen,
+  currentRoomMembers,
+}: AddRoomMemberDialogProps) => {
+  const { id: conversationId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
 
-  const { data: users } = useSWR<EndUser[]>(
-    `/endusers/search?search=${searchQuery}`,
+  const { data: users, error } = useSWR<EndUser[]>(
+    `/endusers/search?search=${searchQuery}&limit=100&skip=0`,
     fetcher,
   );
   const handleUserToggle = (userId: string) => {
@@ -41,17 +53,29 @@ const AddRoomMemberDialog = () => {
     );
   };
 
-  const handleAddMembers = () => {
-    console.log(selectedUsers);
+  const getAvailableUsers = () => {
+    return users?.filter(
+      (user) => !currentRoomMembers.some((member) => member._id === user._id),
+    );
   };
 
+  const handleAddMembers = async () => {
+    await addMembersToConversation(conversationId, selectedUsers);
+    setSearchQuery("");
+    setSelectedUsers([]);
+    closeDialog();
+  };
+
+  const closeDialog = () => {
+    setIsOpen(false);
+  };
+
+  if (error) {
+    return <div>{error.response.data.message}</div>;
+  }
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="ghost" className="rounded-full">
-          <DotsHorizontalIcon />
-        </Button>{" "}
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add Chat Members</DialogTitle>
@@ -70,7 +94,7 @@ const AddRoomMemberDialog = () => {
             />
           </div>
           <div className="max-h-[200px] overflow-y-auto">
-            {users?.map((user) => (
+            {getAvailableUsers()?.map((user) => (
               <div key={user._id} className="flex items-center space-x-4 py-2">
                 <Checkbox
                   id={`user-${user._id}`}

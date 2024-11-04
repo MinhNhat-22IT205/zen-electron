@@ -17,4 +17,22 @@ const addConversation = async (
   }
 };
 
-export { addConversation };
+const addMembersToConversation = async (
+  conversationId: string,
+  endUserIds: string[],
+): Promise<null | Conversation> => {
+  try {
+    const response = await http.patch<Conversation>(
+      `${CONVERSTAION_API_ENDPOINT}/${conversationId}/add-members`,
+      {
+        userIds: endUserIds,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export { addConversation, addMembersToConversation };

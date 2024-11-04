@@ -233,19 +233,6 @@ const LivestreamRoom = () => {
           closeShareDialog();
         }}
       />
-      {/* <select
-        id="screen-share-select"
-        className="absolute top-4 left-4 bg-zinc-800 text-white rounded-lg border border-zinc-600 px-4 py-2 shadow-lg backdrop-blur-sm transition-all hover:border-zinc-500 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-opacity-50"
-      />
-      <button
-        id="ok-button"
-        onClick={async () => {
-          await toggleShareScreen();
-        }}
-        className="absolute top-4 left-64 bg-zinc-800 text-white rounded-lg border border-zinc-600 px-4 py-2 shadow-lg backdrop-blur-sm transition-all hover:border-zinc-500 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-opacity-50"
-      >
-        OK
-      </button> */}
     </div>
   );
 };
