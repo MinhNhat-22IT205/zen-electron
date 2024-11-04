@@ -4,6 +4,7 @@ import { ScrollArea } from "../../../../shared/components/shadcn-ui/scroll-area"
 import Text from "../../../../shared/components/shadcn-ui/text";
 import {
   CameraIcon,
+  DotsHorizontalIcon,
   ImageIcon,
   Link2Icon,
   PaperPlaneIcon,
@@ -41,6 +42,7 @@ const ChatRoom = () => {
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
+            className="rounded-full"
             onClick={() =>
               navigate(`/call-room?conversationId=${id}&isSender=true`)
             }
@@ -74,6 +76,9 @@ const ChatRoom = () => {
             </svg>
           </Button>
           {/* <Button variant="ghost">Audio</Button> */}
+          <Button variant="ghost" className="rounded-full">
+            <DotsHorizontalIcon />
+          </Button>
         </div>
       </div>
       {/* Chat Messages & Message Input */}

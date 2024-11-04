@@ -7,6 +7,7 @@ import {
   BellIcon,
   ChatBubbleIcon,
   Cross2Icon,
+  ExitIcon,
   HomeIcon,
 } from "@radix-ui/react-icons";
 import { useAuthStore } from "../shared/libs/zustand/auth.zustand";
@@ -71,7 +72,7 @@ const LeftSidebar = () => {
           asChild
         >
           <Link to="/feeds" className="flex items-center gap-2">
-            <HomeIcon className="w-5 h-5" />
+            {/* <HomeIcon className="w-5 h-5" /> */}
             <Text>Feeds</Text>
           </Link>
         </Button>
@@ -80,8 +81,18 @@ const LeftSidebar = () => {
           className="w-full flex justify-start space-x-3"
           asChild
         >
+          <Link to="/groups" className="flex items-center gap-2">
+            {/* <People className="w-5 h-5" /> */}
+            <Text>Groups</Text>
+          </Link>
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full flex justify-start space-x-3"
+          asChild
+        >
           <Link to="/conversations" className="flex items-center gap-2">
-            <ChatBubbleIcon className="w-5 h-4.5" />
+            {/* <ChatBubbleIcon className="w-5 h-4.5" /> */}
             <Text>Chats</Text>
           </Link>
         </Button>
@@ -91,7 +102,7 @@ const LeftSidebar = () => {
           asChild
         >
           <Link to="/notification" className="flex items-center gap-2">
-            <BellIcon className="w-5 h-5" />
+            {/* <BellIcon className="w-5 h-5" /> */}
             <Text>Notificaiton</Text>
           </Link>
         </Button>
@@ -105,7 +116,7 @@ const LeftSidebar = () => {
             className="flex items-center gap-2"
             onClick={() => authStore.setEndUser(null)}
           >
-            <Cross2Icon className="w-5 h-5" />
+            {/* <ExitIcon className="w-5 h-5" /> */}
             <Text>Logout</Text>
           </Link>
         </Button>

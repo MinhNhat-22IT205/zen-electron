@@ -4,6 +4,7 @@ import useRecordingTimer from "./useRecordingTimer";
 export type DownloadData = {
   url: string;
   filename: string;
+  recordedBlob: Blob;
 };
 
 const useStreamRecord = () => {
@@ -49,7 +50,7 @@ const useStreamRecord = () => {
         // Create download link
         const downloadLink = URL.createObjectURL(recordedBlob);
         const filename = `recording-${Date.now()}.webm`;
-        setDownloadData({ url: downloadLink, filename });
+        setDownloadData({ url: downloadLink, filename, recordedBlob });
         console.log("recordedBlob", downloadLink);
         setIsRecording(false);
         setCanDownload(true);

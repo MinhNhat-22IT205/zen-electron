@@ -13,28 +13,49 @@ type PostImagesProps = {
 const PostImages = ({ images }: PostImagesProps) => {
   return (
     <div className="grid grid-cols-2 gap-2">
-      {images.map((src, index) => (
-        <>
+      {images.map((src, index) => {
+        const isVideo = src.match(/\.(webm|mp4|mov|avi)$/i);
+        return (
           <Dialog>
             <DialogTrigger asChild>
-              <img
-                key={index}
-                src={IMAGE_BASE_URL + src}
-                alt={`Post Image ${index + 1}`}
-                className="w-full h-40 object-cover rounded-md"
-              />
+              {isVideo ? (
+                <video
+                  key={index}
+                  src={IMAGE_BASE_URL + src}
+                  className="w-full h-40 object-cover rounded-md cursor-pointer"
+                  controls={false}
+                  autoPlay={false}
+                  muted={true}
+                />
+              ) : (
+                <img
+                  key={index}
+                  src={IMAGE_BASE_URL + src}
+                  alt={`Post Image ${index + 1}`}
+                  className="w-full h-40 object-cover rounded-md"
+                />
+              )}
             </DialogTrigger>
             <DialogContent>
-              <img
-                key={index}
-                src={IMAGE_BASE_URL + src}
-                alt={`Post Image ${index + 1}`}
-                className="w-full h-full object-cover rounded-md"
-              />
+              {isVideo ? (
+                <video
+                  key={index}
+                  src={IMAGE_BASE_URL + src}
+                  className="w-full h-full object-cover rounded-md"
+                  controls={true}
+                />
+              ) : (
+                <img
+                  key={index}
+                  src={IMAGE_BASE_URL + src}
+                  alt={`Post Image ${index + 1}`}
+                  className="w-full h-full object-cover rounded-md"
+                />
+              )}
             </DialogContent>
           </Dialog>
-        </>
-      ))}
+        );
+      })}
     </div>
   );
 };

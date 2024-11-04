@@ -16,6 +16,10 @@ import UserProfilePage from "../features/user-profile/components/UserProfilePage
 import LivestreamRoom from "../features/livestream/components/stream/LivestreamRoom";
 import LivestreamList from "../features/livestream/components/LivestreamList";
 import AddLivestreamButton from "../features/livestream/components/add-livestream/AddLivestreamButton";
+import PostIdPage from "../features/post/components/post-id/PostIdPage";
+import GroupPage from "../features/group/components/GroupPage";
+import GroupIdPage from "../features/group/components/GroupIdPage";
+import JoinGroupRequestList from "../features/group/components/group-request/JoinGroupRequestList";
 const AppRoutes = () => {
   return (
     <>
@@ -48,7 +52,14 @@ const AppRoutes = () => {
               }
             >
               <Route index element={<FeedPage />} />
+              <Route path=":id" element={<PostIdPage />} />
             </Route>
+            <Route path="groups" element={<GroupPage />} />
+            <Route path="groups/:id" element={<GroupIdPage />} />
+            <Route
+              path="groups/:id/requests"
+              element={<JoinGroupRequestList />}
+            />
             <Route path="search" element={<SearchPage />} />
             <Route path="user-profile/:id" element={<UserProfilePage />} />
           </Route>

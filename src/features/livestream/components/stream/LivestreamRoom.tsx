@@ -27,12 +27,23 @@ import {
 } from "@/src/shared/components/shadcn-ui/dropdown";
 import { useDisclosure } from "@/src/shared/hooks/use-disclosure";
 import ScreenShareListDialog from "@/src/shared/components/ScreenShareListDialog";
+import AddPostAfterRecordingDialog from "../AddPostAfterRecordingDialog";
 const clientSocket = io(SERVER_SOCKET_URL + "/livestream");
 const LivestreamRoom = () => {
   const { id } = useParams();
   const myEndUser = useAuthStore((state) => state.endUser);
   const { setSocket } = useSocketStore();
-  const { isOpen, open, close } = useDisclosure();
+  const {
+    isOpen: isShareDialogOpen,
+    open: openShareDialog,
+    close: closeShareDialog,
+  } = useDisclosure();
+  const {
+    isOpen: isPostDialogOpen,
+    open: openPostDialog,
+    close: closePostDialog,
+  } = useDisclosure();
+  useDisclosure();
   const [screenShareSources, setScreenShareSources] = useState<
     Electron.DesktopCapturerSource[]
   >([]);
@@ -136,7 +147,7 @@ const LivestreamRoom = () => {
                   } else {
                     getScreenShareSources().then((sources) => {
                       setScreenShareSources(sources);
-                      open();
+                      openShareDialog();
                     });
                   }
                 }}
@@ -170,19 +181,43 @@ const LivestreamRoom = () => {
           </DropdownMenu>
 
           {canDownload && (
-            <LivestreamControlButton
-              icon={<DownloadIcon className="h-5 w-5" />}
-              onClick={() => {
-                if (downloadData) {
-                  const link = document.createElement("a");
-                  link.href = downloadData.url;
-                  link.download = downloadData.filename;
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }
-              }}
-            />
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <LivestreamControlButton
+                    icon={<DownloadIcon className="h-5 w-5" />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (downloadData) {
+                        const link = document.createElement("a");
+                        link.href = downloadData.url;
+                        link.download = downloadData.filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }
+                    }}
+                  >
+                    Download the recording
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      openPostDialog();
+                    }}
+                  >
+                    Post the recording
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <AddPostAfterRecordingDialog
+                downloadData={downloadData}
+                isOpen={isPostDialogOpen}
+                onClose={closePostDialog}
+              />
+            </>
           )}
         </div>
       </div>
@@ -190,12 +225,12 @@ const LivestreamRoom = () => {
       <LivestreamChatCard />
 
       <ScreenShareListDialog
-        isOpen={isOpen}
-        onClose={close}
+        isOpen={isShareDialogOpen}
+        onClose={closeShareDialog}
         sources={screenShareSources}
         onSourceSelect={(source) => {
           startScreenShare(source.id);
-          close();
+          closeShareDialog();
         }}
       />
       {/* <select

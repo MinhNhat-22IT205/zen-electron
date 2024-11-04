@@ -12,7 +12,7 @@ const addPost = async (values: ztAddPostInputs) => {
     // Append each image file
     if (values.images) {
       Array.from(values.images).forEach((file) => {
-        formData.append("files", file); // Use the same field name as defined in your server
+        formData.append("files", file);
       });
     }
     const result = await http.post<PostJson>(ADD_POST_API_ENDPOINT, formData, {
