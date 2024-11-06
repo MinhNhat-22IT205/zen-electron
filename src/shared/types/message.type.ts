@@ -2,7 +2,7 @@ import { EndUserMinimal } from "./enduser.type";
 
 type Message = {
   _id: string;
-  endUserId: string;
+  endUserId: EndUserMinimal;
   conversationId: string;
   content: string;
   visibility: "retrieve" | "delete" | "normal";

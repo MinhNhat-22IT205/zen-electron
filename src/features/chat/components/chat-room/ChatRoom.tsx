@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/src/shared/components/shadcn-ui/dropdown";
 import RoomMemberDialog from "./RoomMemberDialog";
+import { getConversationName } from "@/src/shared/helpers/get-conversation-name";
 
 const ChatRoom = () => {
   const navigate = useNavigate();
@@ -38,16 +39,15 @@ const ChatRoom = () => {
     CONVERSTAION_API_ENDPOINT + "/" + id,
     fetcher,
   );
-  const otherEndUser = conversation?.endUserIds.find(
-    (endUser) => endUser._id !== myEndUserId,
-  );
   useEffect(() => {
     unreadConversationStore.removeUnreadConversationId(id);
   }, [id]);
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex justify-between items-center p-2 border-b">
-        <Text className="flex-1 font-bold"> {otherEndUser?.username} </Text>
+        <Text className="flex-1 font-bold">
+          {getConversationName(conversation?.endUserIds)}
+        </Text>
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"

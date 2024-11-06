@@ -7,7 +7,7 @@ import { Message as MessageType } from "@/src/shared/types/message.type";
 import useChatSocket from "../../hooks/useChatSocket";
 import { ScrollArea } from "@/src/shared/components/shadcn-ui/scroll-area";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
-import { PaperPlaneIcon } from "@radix-ui/react-icons";
+import { ImageIcon, Link2Icon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { Input } from "@/src/shared/components/shadcn-ui/input";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 
@@ -51,11 +51,12 @@ const MessageList = () => {
     <>
       <ScrollArea className="flex-1 h-full w-full">
         <div className="">
-          {messages?.map((message) => (
+          {messages?.map((message, index) => (
             <Message
               key={message._id}
               message={message}
               seenMessage={seenMessage}
+              previousMessage={index > 0 ? messages[index - 1] : null}
             />
           ))}
         </div>
@@ -78,14 +79,14 @@ const MessageList = () => {
         </Button>
       </div>
       {/* File send control panel */}
-      {/* <div className="flex items-center py-2 px-4 gap-2">
+      <div className="flex items-center py-2 px-4 gap-2">
         <Button variant="ghost" className="!p-1 !h-5">
           <ImageIcon className="w-4 h-4" />
         </Button>
         <Button variant="ghost" className="!p-1 !h-5">
           <Link2Icon className="w-4 h-4" />
         </Button>
-      </div> */}
+      </div>
     </>
   );
 };

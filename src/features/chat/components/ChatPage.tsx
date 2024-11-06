@@ -16,7 +16,7 @@ const ChatPage = () => {
     <>
       <div className="h-screen w-full flex flex-col ">
         <div className="flex w-full h-full flex-1">
-          <div className="w-64 h-full bg-white border border-gray-200">
+          <div className="w-80 h-full bg-white border border-gray-200">
             <ConversationList />
           </div>
           <div className="h-full w-full">

@@ -7,14 +7,14 @@ import { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
 const useOutsideListenerSocket = (clientSocket: Socket) => {
-  const myEndUserId = useAuthStore((state) => state.endUser?._id);
+  const myEndUser = useAuthStore((state) => state.endUser);
   const activeUserIdStore = useActiveUserIdStore();
   const callDialogStore = useCallRequestDialogStore();
   const { setSocket } = useSocketStore();
 
   useEffect(() => {
     setSocket(clientSocket);
-    clientSocket.emit("endUserConnect", { endUserId: myEndUserId });
+    clientSocket.emit("endUserConnect", { endUserId: myEndUser._id });
 
     const activeListInterval = setInterval(() => {
       clientSocket.emit("activeList", {});
@@ -44,18 +44,12 @@ const useOutsideListenerSocket = (clientSocket: Socket) => {
       clientSocket.off("activeList", handleActiveList);
       clientSocket.off("requestCall", handleRequestCall);
     };
-  }, [
-    clientSocket,
-    myEndUserId,
-    callDialogStore,
-    activeUserIdStore,
-    setSocket,
-  ]);
+  }, [clientSocket, myEndUser, callDialogStore, activeUserIdStore, setSocket]);
 
   const denyCall = () => {
     clientSocket.emit("requestDeny", {
       conversationId: callDialogStore.callingConversationId,
-      fromEndUserId: myEndUserId,
+      fromEndUser: myEndUser,
     });
   };
 

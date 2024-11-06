@@ -1,5 +1,7 @@
+import { useToast } from "@/src/shared/hooks/use-toast";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useSocketStore } from "@/src/shared/libs/zustand/socket-instance.zustand";
+import { EndUser } from "@/src/shared/types/enduser.type";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Socket } from "socket.io-client";
@@ -26,6 +28,7 @@ interface CustomRTCPeerConnection extends RTCPeerConnection {
 
 const useCallSocket = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const conversationId = searchParams.get("conversationId");
   const isSender = searchParams.get("isSender") === "true";
@@ -94,9 +97,13 @@ const useCallSocket = () => {
     clientSocket.on("callMessageFromPeer", handleMessageFromPeer);
   };
 
-  const handleRequestDenied = () => {
-    reset();
-    navigate(`/conversations/${conversationId}`);
+  const handleRequestDenied = ({ fromEndUser }: { fromEndUser: EndUser }) => {
+    toast({
+      title: "Call denied",
+      description: `The call was denied by ${fromEndUser.username}`,
+    });
+    // reset();
+    // navigate(`/conversations/${conversationId}`);
   };
 
   const handleRequestAccepted = ({
