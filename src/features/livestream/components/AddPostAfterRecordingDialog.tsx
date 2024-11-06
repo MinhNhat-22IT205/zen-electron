@@ -39,9 +39,7 @@ import { DropdownMenuItem } from "@/src/shared/components/shadcn-ui/dropdown";
 import { useDisclosure } from "@/src/shared/hooks/use-disclosure";
 
 type AddPostAfterRecordingDialogProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  downloadData: {
+  videoData: {
     url: string;
     filename: string;
     recordedBlob: Blob;
@@ -49,16 +47,14 @@ type AddPostAfterRecordingDialogProps = {
 };
 
 const AddPostAfterRecordingDialog = ({
-  downloadData,
-  isOpen,
-  onClose,
+  videoData,
 }: AddPostAfterRecordingDialogProps) => {
   const navigate = useNavigate();
   const { groups } = useFetchYourGroups();
-  const [previews, setPreviews] = useState<string[]>([downloadData.url]);
-
+  const [previews, setPreviews] = useState<string[]>([videoData.url]);
+  const [isOpen, setIsOpen] = useState(false);
   const createTransferableFile = (): FileList => {
-    const file = new File([downloadData.recordedBlob], downloadData.filename, {
+    const file = new File([videoData.recordedBlob], videoData.filename, {
       type: "video/webm",
     });
     const dataTransfer = new DataTransfer();
@@ -77,10 +73,20 @@ const AddPostAfterRecordingDialog = ({
 
   const onSubmit = async (values: ztAddGroupPostInputs) => {
     await addGroupPost(values);
-    onClose();
   };
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            // prevent the dropdown from closing
+            e.preventDefault();
+            setIsOpen(true);
+          }}
+        >
+          Post the recording
+        </DropdownMenuItem>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add a post</DialogTitle>

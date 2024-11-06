@@ -203,20 +203,9 @@ const LivestreamRoom = () => {
                   >
                     Download the recording
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      openPostDialog();
-                    }}
-                  >
-                    Post the recording
-                  </DropdownMenuItem>
+                  <AddPostAfterRecordingDialog videoData={downloadData} />
                 </DropdownMenuContent>
               </DropdownMenu>
-              <AddPostAfterRecordingDialog
-                downloadData={downloadData}
-                isOpen={isPostDialogOpen}
-                onClose={closePostDialog}
-              />
             </>
           )}
         </div>
