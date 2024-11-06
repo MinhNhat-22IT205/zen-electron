@@ -16,7 +16,7 @@ const PostImages = ({ images }: PostImagesProps) => {
       {images.map((src, index) => {
         const isVideo = src.match(/\.(webm|mp4|mov|avi)$/i);
         return (
-          <Dialog>
+          <Dialog key={index}>
             <DialogTrigger asChild>
               {isVideo ? (
                 <video
