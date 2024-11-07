@@ -1,3 +1,4 @@
+import FileDisplay from "@/src/shared/components/FileDisplay";
 import {
   DialogContent,
   DialogTrigger,
@@ -12,9 +13,17 @@ type PostImagesProps = {
 };
 const PostImages = ({ images }: PostImagesProps) => {
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div
+      className={`grid ${images.length === 1 ? "grid-cols-1" : "grid-cols-2"} gap-2`}
+    >
       {images.map((src, index) => {
+        const fileName = src.split(" ").pop();
+        const isImage = src.match(/\.(jpg|jpeg|png|gif|bmp|tiff|webp)$/i);
         const isVideo = src.match(/\.(webm|mp4|mov|avi)$/i);
+        if (!isImage && !isVideo)
+          return (
+            <FileDisplay filename={fileName} fileUrl={IMAGE_BASE_URL + src} />
+          );
         return (
           <Dialog key={index}>
             <DialogTrigger asChild>

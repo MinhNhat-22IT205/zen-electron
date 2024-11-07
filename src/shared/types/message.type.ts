@@ -8,6 +8,7 @@ type Message = {
   visibility: "retrieve" | "delete" | "normal";
   read: boolean;
   createdAt: Date;
+  type: "text" | "file";
 };
 type LivestreamMessage = {
   endUser: EndUserMinimal;

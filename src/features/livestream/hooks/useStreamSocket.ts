@@ -57,6 +57,7 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   } = useScreenShare();
 
   const localStreamRef = useRef<MediaStream | null>(null);
+  const remoteStreamRef = useRef<MediaStream | null>(null);
   const peerConnectionsRef = useRef<{ [key: string]: CustomRTCPeerConnection }>(
     {},
   );
@@ -73,7 +74,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
     if (!clientSocket) {
       return;
     }
-
     const initializeCall = async () => {
       console.log("initializeCall", isHost);
       reset();
@@ -128,7 +128,7 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
     }
   };
 
-  const handleStopLiveStream = () => {
+  const handleStopLiveStream = ({ liveStreamId }: { liveStreamId: string }) => {
     reset();
     navigate(`/feeds`);
   };
@@ -205,7 +205,11 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   const setupRemoteStream = (memberId: string) => {
     const remoteStream = new MediaStream();
     let remoteVideo = document.getElementById("streamer") as HTMLVideoElement;
-    if (!remoteVideo) remoteVideo = document.createElement("video");
+    console.log("remoteVideo1", remoteVideo);
+    if (!remoteVideo) {
+      remoteVideo = document.createElement("video");
+      remoteVideo.id = "streamer";
+    }
     remoteVideo.srcObject = remoteStream;
     remoteVideo.autoplay = true;
   };
@@ -249,11 +253,16 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
 
   const handleTrack = (memberId: string) => (event: RTCTrackEvent) => {
     const remoteStream = new MediaStream();
+    remoteStreamRef.current = remoteStream;
     event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track);
     });
     const remoteVideo = document.getElementById("streamer") as HTMLVideoElement;
-    if (remoteVideo) remoteVideo.srcObject = remoteStream;
+    console.log("remoteVideo", remoteVideo);
+    if (remoteVideo) {
+      remoteVideo.srcObject = remoteStream;
+      remoteVideo.autoplay = true;
+    }
   };
 
   const handleIceCandidateEvent =
@@ -292,6 +301,7 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
       await peerConnectionsRef.current[memberId]?.setRemoteDescription(answer);
       flushIceCandidates(memberId);
     }
+    console.log("addAnswer", memberId);
   };
 
   const handleIceCandidate = async (
@@ -338,7 +348,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   const leaveChannel = () => {
     cleanupPeerConnections();
     if (isHost) {
-      return;
       clientSocket.emit("stopLiveStream", {
         liveStreamId,
         fromEndUserId: myEndUser._id,
@@ -365,10 +374,17 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   const toggleMic = () => toggleTrack("audio");
 
   const startRecording = async () => {
-    console.log("startRecording", "localStream", localStreamRef.current);
-    if (!localStreamRef.current) return;
-    const newRecording = await startStreamRecord(localStreamRef.current);
-    setRecording(newRecording);
+    if (isHost) {
+      console.log("startRecording", "localStream", localStreamRef.current);
+      if (!localStreamRef.current) return;
+      const newRecording = await startStreamRecord(localStreamRef.current);
+      setRecording(newRecording);
+    } else {
+      console.log("startRecording", "remoteStream", remoteStreamRef.current);
+      if (!remoteStreamRef.current) return;
+      const newRecording = await startStreamRecord(remoteStreamRef.current);
+      setRecording(newRecording);
+    }
   };
   const stopRecording = () => {
     if (recording) recording.stop();

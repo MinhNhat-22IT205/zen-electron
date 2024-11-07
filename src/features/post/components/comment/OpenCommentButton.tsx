@@ -17,17 +17,19 @@ const OpenCommentButton = ({ post }: OpenCommentButtonProps) => {
       <Button variant="ghost" onClick={open}>
         <ChatBubbleIcon className="h-4 w-4 mr-2" />
       </Button>
-      <CommentDialog
-        isOpen={isCommentOpen}
-        onChange={(isOpen) => {
-          if (!isOpen) {
-            close();
-          } else {
-            open();
-          }
-        }}
-        post={post}
-      />
+      {isCommentOpen && (
+        <CommentDialog
+          isOpen={isCommentOpen}
+          onChange={(isOpen) => {
+            if (!isOpen) {
+              close();
+            } else {
+              open();
+            }
+          }}
+          post={post}
+        />
+      )}
     </>
   );
 };

@@ -46,7 +46,7 @@ const ChatRoom = () => {
     <div className="w-full h-full flex flex-col">
       <div className="flex justify-between items-center p-2 border-b">
         <Text className="flex-1 font-bold">
-          {getConversationName(conversation?.endUserIds)}
+          {getConversationName(conversation?.endUserIds, myEndUserId)}
         </Text>
         <div className="flex items-center justify-between">
           <Button

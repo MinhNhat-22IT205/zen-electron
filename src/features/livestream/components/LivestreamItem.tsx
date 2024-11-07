@@ -14,20 +14,21 @@ const LivestreamItem = ({
 }) => {
   return (
     <Link to={`/livestream/${livestream._id}`}>
-      <div className="border-2 border-red-400 p-0.5 rounded-lg">
-        <ListItemWithAvatar
-          avatarSrc={IMAGE_BASE_URL + livestream.endUser.avatar}
-          avatarFallback={livestream.title}
-        >
-          <ItemInfo>
-            <h4 className="text-sm font-semibold">{livestream.title}</h4>{" "}
-            <p className="text-sm">{livestream.description}</p>
-          </ItemInfo>
-          <ItemAction>
-            <></>
-          </ItemAction>
-        </ListItemWithAvatar>
-      </div>
+      <ListItemWithAvatar
+        avatarSrc={IMAGE_BASE_URL + livestream.endUser.avatar}
+        avatarFallback={livestream.title}
+        className="border border-red-200 transition-all hover:border-red-300"
+      >
+        <ItemInfo>
+          <h4 className="text-sm font-semibold">{livestream.title}</h4>{" "}
+          <p className="text-sm">{livestream.description}</p>
+        </ItemInfo>
+        <ItemAction>
+          <div className=" rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
+            LIVE
+          </div>
+        </ItemAction>
+      </ListItemWithAvatar>
     </Link>
   );
 };

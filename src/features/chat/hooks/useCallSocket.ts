@@ -102,6 +102,7 @@ const useCallSocket = () => {
       title: "Call denied",
       description: `The call was denied by ${fromEndUser.username}`,
     });
+
     // reset();
     // navigate(`/conversations/${conversationId}`);
   };

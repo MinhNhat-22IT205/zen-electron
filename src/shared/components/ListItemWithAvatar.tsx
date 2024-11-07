@@ -28,18 +28,25 @@ export const ListItemWithAvatar: React.FC<{
   );
 };
 
-export const ItemInfo: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const ItemInfo: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className }) => {
   return (
-    <div className="space-y-1 flex flex-col items-start w-full flex-1">
+    <div
+      className={cn(
+        "space-y-1 flex flex-col items-start w-full flex-1",
+        className,
+      )}
+    >
       {children}
     </div>
   );
 };
 
-export const ItemAction: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  return <>{children}</>;
+export const ItemAction: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className }) => {
+  return <div className={className}>{children}</div>;
 };

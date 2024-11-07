@@ -17,7 +17,7 @@ const RightSidebar = ({
   return (
     <div className="h-full w-72 p-4 shadow-xl bg-white">
       {/* User Requests */}
-      <Heading>Join group requests</Heading>
+      {/* <Heading>Join group requests</Heading> */}
       {/* <div className="flex items-center justify-center space-x-3 gap-2">
         <img
           className="w-12 h-12 rounded-full"
@@ -39,10 +39,10 @@ const RightSidebar = ({
           </div>
         </div>
       </div> */}
-      <div className="h-20" />
-      <div className="border-2 border-dashed mt-6 mb-4" />
+      {/* <div className="h-20" /> */}
+      {/* <div className="border-2 border-dashed mt-6 mb-4" /> */}
       <div className="flex items-center justify-between">
-        <Heading>Livestreams</Heading>
+        <Heading className="py-4 text-red-600">Livestreams</Heading>
         {addLivestreamButtonComponent}
       </div>
       {livestreamListComponent}

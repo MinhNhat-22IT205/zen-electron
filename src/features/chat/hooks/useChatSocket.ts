@@ -24,6 +24,7 @@ export default function useChatSocket({
     if (!conversationId || !clientSocket) return;
 
     const handleSendMessage = (message: Message) => {
+      console.log("message", message);
       if (message.conversationId === conversationId) {
         uiControl.addMessageToUI(message);
       } else {
@@ -62,5 +63,15 @@ export default function useChatSocket({
     });
   };
 
-  return { emitMessage, seenMessage };
+  const emitFileMessage = async (file: File, endUserId: string) => {
+    const fileName = file.name;
+    clientSocket?.emit("sendFile", {
+      file,
+      fileName,
+      endUserId,
+      conversationId,
+    });
+  };
+
+  return { emitMessage, seenMessage, emitFileMessage };
 }

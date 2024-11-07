@@ -9,6 +9,8 @@ import {
   AvatarImage,
 } from "@/src/shared/components/shadcn-ui/avatar";
 import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
+import FileDisplay from "@/src/shared/components/FileDisplay";
+import { getFileType } from "@/src/shared/helpers/get-file-type";
 
 type MessageProps = {
   message: MessageType;
@@ -20,6 +22,7 @@ const Message = ({ message, previousMessage, seenMessage }: MessageProps) => {
   const myUserId = useAuthStore((state) => state.endUser?._id);
   const isMe = message.endUserId?._id === myUserId;
 
+  console.log("myUserId", myUserId, message.endUserId?._id, message.content);
   const messageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,9 +79,22 @@ const Message = ({ message, previousMessage, seenMessage }: MessageProps) => {
           )}
           <div
             onClick={toggle}
-            className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
+            className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${message.type != "text" && "!bg-white"} ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
           >
-            {message.content}
+            {message.type === "text" ? (
+              message.content
+            ) : getFileType(message.content) !== "image" ? (
+              <FileDisplay
+                filename={message.content.split(" ").pop()}
+                fileUrl={message.content}
+              />
+            ) : (
+              <img
+                src={IMAGE_BASE_URL + message.content}
+                className="w-40 h-40"
+                alt="file"
+              />
+            )}
           </div>
         </div>
       </div>

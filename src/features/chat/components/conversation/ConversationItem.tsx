@@ -60,7 +60,7 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
         <div
           className={`flex flex-1 flex-col items-start justify-center ${isUnread ? "font-bold" : ""}`}
         >
-          <p>{getConversationName(conversation.endUserIds)}</p>
+          <p>{getConversationName(conversation.endUserIds, myEndUserId)}</p>
         </div>
 
         <div
