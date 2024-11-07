@@ -70,7 +70,12 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
     removeSocketListeners();
   };
   useEffect(() => {
-    console.log("clientSocket", clientSocket);
+    console.log(
+      "clientSocket",
+      clientSocket,
+      document.getElementById("streamer"),
+    );
+
     if (!clientSocket) {
       return;
     }
@@ -83,7 +88,15 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
       if (isHost) await setupLocalStream();
     };
 
-    initializeCall();
+    //wait for ui to load
+    setTimeout(() => {
+      console.log(
+        "clientSocket2",
+        clientSocket,
+        document.getElementById("streamer"),
+      );
+      initializeCall();
+    }, 1000);
 
     return reset;
   }, [clientSocket, isHost]);
@@ -208,6 +221,7 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
     console.log("remoteVideo1", remoteVideo);
     if (!remoteVideo) {
       remoteVideo = document.createElement("video");
+      remoteVideo.className = "video-player";
       remoteVideo.id = "streamer";
     }
     remoteVideo.srcObject = remoteStream;
