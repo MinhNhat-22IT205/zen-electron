@@ -44,7 +44,7 @@ const AddRoomMemberDialog = ({
     isOpen ? `/endusers/search?search=${searchQuery}&limit=100&skip=0` : null,
     fetcher,
     {
-      refreshInterval: 2000,
+      // refreshInterval: 2000,
     },
   );
   const handleUserToggle = (userId: string) => {

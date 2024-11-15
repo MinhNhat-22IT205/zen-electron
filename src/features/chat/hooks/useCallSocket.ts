@@ -2,7 +2,7 @@ import { useToast } from "@/src/shared/hooks/use-toast";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useSocketStore } from "@/src/shared/libs/zustand/socket-instance.zustand";
 import { EndUser } from "@/src/shared/types/enduser.type";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
@@ -35,8 +35,10 @@ const useCallSocket = () => {
   const myEndUser = useAuthStore((state) => state.endUser);
   const { socket: clientSocket } = useSocketStore();
 
-  let localStream: MediaStream | null = null;
-  let peerConnections: { [key: string]: CustomRTCPeerConnection } = {};
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const peerConnectionsRef = useRef<{ [key: string]: CustomRTCPeerConnection }>(
+    {},
+  );
 
   const reset = () => {
     console.log("Resetting connections and streams");
@@ -61,15 +63,17 @@ const useCallSocket = () => {
   }, []);
 
   const cleanupLocalStream = () => {
-    if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop());
-      localStream = null;
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => track.stop());
+      localStreamRef.current = null;
     }
   };
 
   const cleanupPeerConnections = () => {
-    Object.values(peerConnections).forEach((connection) => connection.close());
-    peerConnections = {};
+    Object.values(peerConnectionsRef.current).forEach((connection) =>
+      connection.close(),
+    );
+    peerConnectionsRef.current = {};
   };
 
   const removeRemoteVideos = () => {
@@ -119,9 +123,9 @@ const useCallSocket = () => {
   const handleUserLeft = ({ fromEndUserId }: { fromEndUserId: string }) => {
     const remoteVideo = document.getElementById(fromEndUserId);
     if (remoteVideo) remoteVideo.style.display = "none";
-    if (peerConnections[fromEndUserId]) {
-      peerConnections[fromEndUserId].close();
-      delete peerConnections[fromEndUserId];
+    if (peerConnectionsRef.current[fromEndUserId]) {
+      peerConnectionsRef.current[fromEndUserId].close();
+      delete peerConnectionsRef.current[fromEndUserId];
     }
   };
 
@@ -159,11 +163,11 @@ const useCallSocket = () => {
 
   const setupLocalStream = async () => {
     try {
-      localStream =
+      localStreamRef.current =
         await navigator.mediaDevices.getUserMedia(MEDIA_CONSTRAINTS);
       const localVideo = document.getElementById("user-1") as HTMLVideoElement;
-      if (localVideo) localVideo.srcObject = localStream;
-      console.log("localStream", localStream);
+      if (localVideo) localVideo.srcObject = localStreamRef.current;
+      console.log("localStream", localStreamRef.current);
     } catch (error) {
       console.error("Error accessing media devices.", error);
     }
@@ -171,16 +175,16 @@ const useCallSocket = () => {
 
   const createOffer = async (joinerId: string) => {
     await createPeerConnection(joinerId);
-    const offer = await peerConnections[joinerId]?.createOffer();
-    await peerConnections[joinerId]?.setLocalDescription(offer);
+    const offer = await peerConnectionsRef.current[joinerId]?.createOffer();
+    await peerConnectionsRef.current[joinerId]?.setLocalDescription(offer);
 
     emitCallMessage("offer", joinerId, offer);
   };
 
   const createPeerConnection = async (memberId: string) => {
     const peerConnection = new RTCPeerConnection(ICE_SERVERS);
-    peerConnections[memberId] = peerConnection;
-    peerConnections[memberId].pendingCandidates = [];
+    peerConnectionsRef.current[memberId] = peerConnection;
+    peerConnectionsRef.current[memberId].pendingCandidates = [];
 
     setupRemoteStream(memberId);
     await addLocalStreamTracks(peerConnection);
@@ -200,16 +204,16 @@ const useCallSocket = () => {
   };
 
   const addLocalStreamTracks = async (peerConnection: RTCPeerConnection) => {
-    if (!localStream) {
-      localStream = await navigator.mediaDevices.getUserMedia({
+    if (!localStreamRef.current) {
+      localStreamRef.current = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
       const localVideo = document.getElementById("user-1") as HTMLVideoElement;
-      if (localVideo) localVideo.srcObject = localStream;
+      if (localVideo) localVideo.srcObject = localStreamRef.current;
     }
-    localStream.getTracks().forEach((track) => {
-      peerConnection.addTrack(track, localStream!);
+    localStreamRef.current?.getTracks().forEach((track) => {
+      peerConnection.addTrack(track, localStreamRef.current!);
     });
   };
 
@@ -240,7 +244,9 @@ const useCallSocket = () => {
     };
 
   const handleIceConnectionStateChange = (memberId: string) => () => {
-    if (peerConnections[memberId].iceConnectionState === "connected") {
+    if (
+      peerConnectionsRef.current[memberId].iceConnectionState === "connected"
+    ) {
       flushIceCandidates(memberId);
     }
   };
@@ -250,9 +256,9 @@ const useCallSocket = () => {
     offer: RTCSessionDescriptionInit,
   ) => {
     await createPeerConnection(memberId);
-    await peerConnections[memberId]?.setRemoteDescription(offer);
-    const answer = await peerConnections[memberId]?.createAnswer();
-    await peerConnections[memberId]?.setLocalDescription(answer);
+    await peerConnectionsRef.current[memberId]?.setRemoteDescription(offer);
+    const answer = await peerConnectionsRef.current[memberId]?.createAnswer();
+    await peerConnectionsRef.current[memberId]?.setLocalDescription(answer);
 
     emitCallMessage("answer", memberId, answer);
     flushIceCandidates(memberId);
@@ -262,8 +268,8 @@ const useCallSocket = () => {
     memberId: string,
     answer: RTCSessionDescriptionInit,
   ) => {
-    if (!peerConnections[memberId]?.currentRemoteDescription) {
-      await peerConnections[memberId]?.setRemoteDescription(answer);
+    if (!peerConnectionsRef.current[memberId]?.currentRemoteDescription) {
+      await peerConnectionsRef.current[memberId]?.setRemoteDescription(answer);
       flushIceCandidates(memberId);
     }
   };
@@ -272,7 +278,7 @@ const useCallSocket = () => {
     fromEndUserId: string,
     candidate: RTCIceCandidate,
   ) => {
-    const peerConnection = peerConnections[fromEndUserId];
+    const peerConnection = peerConnectionsRef.current[fromEndUserId];
     if (peerConnection) {
       if (!peerConnection.remoteDescription) {
         peerConnection.pendingCandidates?.push(candidate);
@@ -287,7 +293,7 @@ const useCallSocket = () => {
   };
 
   const flushIceCandidates = async (memberId: string) => {
-    const peerConnection = peerConnections[memberId];
+    const peerConnection = peerConnectionsRef.current[memberId];
     if (peerConnection && peerConnection.pendingCandidates) {
       for (const candidate of peerConnection.pendingCandidates) {
         try {
@@ -319,15 +325,15 @@ const useCallSocket = () => {
   };
 
   const toggleTrack = (kind: "video" | "audio") => {
-    const track = localStream?.getTracks().find((t) => t.kind === kind);
+    const track = localStreamRef.current
+      ?.getTracks()
+      .find((t) => t.kind === kind);
     if (track) {
       track.enabled = !track.enabled;
       const btnId = kind === "video" ? "camera-btn" : "mic-btn";
       const btn = document.getElementById(btnId);
       if (btn) {
-        btn.style.backgroundColor = track.enabled
-          ? "rgb(179, 102, 249, .9)"
-          : "rgb(255, 80, 80)";
+        btn.style.backgroundColor = track.enabled ? "#575e6b" : "#ff0000";
       }
     }
   };

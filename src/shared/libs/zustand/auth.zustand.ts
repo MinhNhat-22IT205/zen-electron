@@ -4,6 +4,7 @@ import { EndUser } from "../../types/enduser.type";
 interface AuthStore {
   endUser: EndUser;
   setEndUser: (endUser: EndUser) => void;
+  logout: () => void;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -19,6 +20,19 @@ const useAuthStore = create<AuthStore>()(
       updatedAt: "",
     },
     setEndUser: (endUser) => set({ endUser }),
+    logout: () =>
+      set({
+        endUser: {
+          _id: "",
+          username: "",
+          email: "",
+          password: "",
+          avatar: "",
+          description: "",
+          createdAt: "",
+          updatedAt: "",
+        },
+      }),
   })),
 );
 

@@ -20,7 +20,7 @@ export default function useFetchEndUser(endUserId: string): {
     const { data, isLoading, error, mutate } = useSWR<EndUserProfile>(
       "/profile/" + endUserId + "?limit=100&skip=0",
       fetcher,
-      { refreshInterval: 2000 },
+      // { refreshInterval: 2000 },
     );
     return {
       endUser: data

@@ -23,9 +23,9 @@ const RegisterForm = () => {
   const form = useForm<ztRegisterInputs>({
     resolver: zodResolver(zRegisterInputs),
     defaultValues: {
-      email: "nhatminhledao2004@gmail.com",
+      email: "randomEmail@gmail.com",
       password: "Password@123",
-      username: "moromoro",
+      username: "randomName",
       confirmPassword: "Password@123",
       gender: "male",
     },
@@ -50,8 +50,8 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="w-[300px] bg-gray-50 flex flex-col text-center p-4 rounded-lg shadow-md gap-4">
-      <h1 className="font-bold text-2xl">Register</h1>
+    <div className="w-[45rem] bg-gray-50 flex flex-col text-center p-4 rounded-lg shadow-md gap-4">
+      <h1 className="font-bold text-2xl">Create your new account</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
@@ -86,7 +86,7 @@ const RegisterForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Password" {...field} />
+                  <Input type="password" placeholder="Password" {...field} />
                 </FormControl>
                 <FormDescription />
                 <FormMessage />
@@ -99,7 +99,11 @@ const RegisterForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Confirm password" {...field} />
+                  <Input
+                    type="password"
+                    placeholder="Confirm password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription />
                 <FormMessage />

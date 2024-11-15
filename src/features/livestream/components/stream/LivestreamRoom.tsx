@@ -63,7 +63,7 @@ const LivestreamRoom = () => {
   const { data: livestream, error } = useSWR<Livestream>(
     `${LIVESTREAM_API_ENDPOINT}/${id}`,
     fetcher,
-    { refreshInterval: 2000 },
+    // { refreshInterval: 2000 },
   );
   const isHost = livestream?.endUserId === myEndUser._id;
   const {

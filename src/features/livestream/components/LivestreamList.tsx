@@ -10,7 +10,7 @@ const LivestreamList = () => {
   const { data: livestreams, error } = useSWR<PopulatedLivestream[]>(
     LIVESTREAM_API_ENDPOINT + "?limit=100&skip=0",
     fetcher,
-    { refreshInterval: 2000 },
+    // { refreshInterval: 2000 },
   );
   if (error) return <div>{error?.message}</div>;
   if (!livestreams) return <div>Loading...</div>;

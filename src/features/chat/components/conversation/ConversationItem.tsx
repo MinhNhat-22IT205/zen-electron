@@ -42,11 +42,11 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
     navigate(`/user-profile/${otherEndUser?._id}`);
 
   return (
-    <div className="p-2 w-full" onClick={navigateToConversation}>
+    <div className="p-2 mb-2 w-full " onClick={navigateToConversation}>
       <div
         className={`
           hover:bg-gray-100 cursor-pointer flex items-center justify-start 
-          gap-2 w-full p-2 rounded-lg ${isCurrentConversation ? "bg-gray-100" : ""}
+          gap-2 w-full p-2 rounded-lg ${isCurrentConversation ? "bg-blue-500/30" : ""}
         `}
       >
         <Avatar className="cursor-pointer" onClick={navigateToUserProfile}>
@@ -64,8 +64,10 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
         </div>
 
         <div
-          className={`w-2 h-2 rounded-full ${hasActiveUser ? "bg-green-500" : "bg-gray-500"}`}
-        />
+          className={`w-8 h-8 rounded-full ${hasActiveUser ? "bg-green-500" : "bg-gray-500"}`}
+        >
+          {hasActiveUser ? "On" : "Off"}
+        </div>
       </div>
     </div>
   );

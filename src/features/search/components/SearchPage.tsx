@@ -35,22 +35,7 @@ const SearchPage = () => {
             }}
           />
         </div>
-        <Tabs
-          value={selectedTab}
-          onValueChange={setSelectedTab}
-          className="max-w-[600px] min-w-[400px]"
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="user">user</TabsTrigger>
-            <TabsTrigger value="feed">feed</TabsTrigger>
-          </TabsList>
-          <TabsContent value="user">
-            <EnduserSearchList searchQuery={searchQuery} />
-          </TabsContent>
-          <TabsContent value="feed">
-            <FeedSearchList />
-          </TabsContent>
-        </Tabs>
+        <EnduserSearchList searchQuery={searchQuery} />
       </div>
     </div>
   );

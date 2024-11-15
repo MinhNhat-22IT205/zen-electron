@@ -5,7 +5,7 @@ import LeftSidebar from "./LeftSidebar";
 const AppLayout = () => {
   return (
     <div className="flex h-screen">
-      <LeftSidebar />
+      {/* <LeftSidebar /> */}
       <div className=" bg-gray-100 pl-4 overflow-y-auto no-scrollbar w-full">
         <Outlet />
       </div>

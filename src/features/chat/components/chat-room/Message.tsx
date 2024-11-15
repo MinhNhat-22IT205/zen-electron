@@ -86,7 +86,7 @@ const Message = ({ message, previousMessage, seenMessage }: MessageProps) => {
             ) : getFileType(message.content) !== "image" ? (
               <FileDisplay
                 filename={message.content.split(" ").pop()}
-                fileUrl={message.content}
+                fileUrl={IMAGE_BASE_URL + message.content}
               />
             ) : (
               <img
