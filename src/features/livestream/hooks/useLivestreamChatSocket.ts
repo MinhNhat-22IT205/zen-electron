@@ -18,7 +18,6 @@ const useLivestreamChatSocket = ({
   }, [socket]);
 
   const handleSendMessage = (message: LivestreamMessage) => {
-    console.log("message received:", message);
     chatUIController.addMessage(message);
   };
   const sendMessage = (message: LivestreamMessage) => {

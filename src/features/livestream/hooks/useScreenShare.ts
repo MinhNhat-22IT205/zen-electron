@@ -9,7 +9,6 @@ const useScreenShare = () => {
   > => {
     try {
       const sources = await window.electron.getSources();
-      console.log("Available sources:", sources);
       return sources;
     } catch (error) {
       console.error("Error getting screen share sources:", error);
@@ -42,7 +41,6 @@ const useScreenShare = () => {
       videoElement.srcObject = stream;
       const screenTrack = stream.getVideoTracks()[0];
       if (screenTrack) {
-        console.log("replace camera track with screen track");
         replaceTrack(screenTrack, peerConnections);
       }
       setIsSharingScreen(true);
@@ -55,10 +53,8 @@ const useScreenShare = () => {
     newTrack: MediaStreamTrack,
     peerConnections: CustomRTCPeerConnection[],
   ) => {
-    console.log("replaceTrack's peerConnections", peerConnections);
     peerConnections.forEach((peerConnection) => {
       const sender = peerConnection.getSenders().forEach((sender) => {
-        console.log(sender.track.kind);
         if (sender.track.kind == "video") {
           sender.replaceTrack(newTrack);
         }
@@ -83,7 +79,6 @@ const useScreenShare = () => {
       videoElement.srcObject = stream;
       const videoTrack = stream.getVideoTracks()[0];
       if (videoTrack) {
-        console.log("switching back to webcam");
         replaceTrack(videoTrack, peerConnections);
       }
       setIsSharingScreen(false);

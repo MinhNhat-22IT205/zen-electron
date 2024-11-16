@@ -7,7 +7,6 @@ import {
 } from "./profile-endpoints.api";
 
 const editProfileInfo = async (values: ztEditProfileInputs) => {
-  console.log("values", values);
   if (values.avatar) {
     try {
       const formData = new FormData();

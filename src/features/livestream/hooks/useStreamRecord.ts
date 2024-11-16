@@ -22,7 +22,6 @@ const useStreamRecord = () => {
   }> {
     try {
       // Get user's camera and microphone stream
-      console.log("localStreamB", localStream);
       if (!localStream) return;
 
       // Initialize MediaRecorder with the stream
@@ -51,7 +50,6 @@ const useStreamRecord = () => {
         const downloadLink = URL.createObjectURL(recordedBlob);
         const filename = `recording-${Date.now()}.webm`;
         setDownloadData({ url: downloadLink, filename, recordedBlob });
-        console.log("recordedBlob", downloadLink);
         setIsRecording(false);
         setCanDownload(true);
       };

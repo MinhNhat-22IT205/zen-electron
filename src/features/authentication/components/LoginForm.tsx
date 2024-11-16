@@ -1,6 +1,6 @@
 import { Button } from "@/src/shared/components/shadcn-ui/button";
 import { Input } from "@/src/shared/components/shadcn-ui/input";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { zLoginInputs, ztLoginInputs } from "../libs/zod/login.zod";
@@ -22,35 +22,20 @@ import { Conversation } from "@/src/shared/types/conversation.type";
 import { CONVERSTAION_API_ENDPOINT } from "../../chat/api/chat-endpoints.api";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
 import useSWR from "swr";
-import { session } from "electron";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const authStore = useAuthStore((state) => state);
-  const myEndUserId = useAuthStore((state) => state.endUser?._id);
-  console.log("userId", myEndUserId);
   const { toast } = useToast();
   const form = useForm<ztLoginInputs>({
     resolver: zodResolver(zLoginInputs),
     defaultValues: {
-      email: "hoanghieufro@gmail.com",
+      email: "randomEmail@gmail.com",
       password: "Password@123",
     },
   });
 
-  const {
-    data: conversations,
-    isLoading,
-    error,
-    mutate,
-  } = useSWR<Conversation[]>(
-    CONVERSTAION_API_ENDPOINT + "?limit=1000&skip=0",
-    fetcher,
-    // { refreshInterval: 1000 },
-  );
-
   const onSubmit = async (values: ztLoginInputs) => {
-    console.log("HELLO WORLD");
     const result = await login(values);
     if ("error" in result) {
       const serverError = result as unknown as ServerError;
@@ -67,13 +52,7 @@ const LoginForm = () => {
       title: "Login successfully!",
       description: "Redirecting to Conversations...",
     });
-    const hasLoadedConversations = !isLoading;
-    console.log(conversations);
-    if (conversations?.length > 0) {
-      navigate("/conversations/" + conversations[0]._id);
-    } else {
-      navigate("/conversations");
-    }
+    navigate("/conversations");
   };
 
   return (

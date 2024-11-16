@@ -2,7 +2,11 @@ import { Button } from "../../../../shared/components/shadcn-ui/button";
 import { Input } from "../../../../shared/components/shadcn-ui/input";
 import { ScrollArea } from "../../../../shared/components/shadcn-ui/scroll-area";
 import Text from "../../../../shared/components/shadcn-ui/text";
-import { DotsHorizontalIcon, LockClosedIcon } from "@radix-ui/react-icons";
+import {
+  DotsHorizontalIcon,
+  LockClosedIcon,
+  CircleIcon,
+} from "@radix-ui/react-icons";
 import {
   Dialog,
   DialogContent,
@@ -35,8 +39,24 @@ import { useToast } from "@/src/shared/hooks/use-toast";
 import http from "@/src/shared/libs/axios/axios.base";
 import { useConversationActiveStore } from "@/src/shared/libs/zustand/conversation-active.zustand";
 import FilesDialog from "./FilesDialog";
+import {
+  AlertDialog,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogTrigger,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/src/shared/components/shadcn-ui/alertDialog";
+import { useActiveUserIdStore } from "@/src/shared/libs/zustand/active-user.zustand";
+import { useConversationIsLocalStore } from "@/src/shared/libs/zustand/conversation-is-local.zustand";
+import { Switch } from "@/src/shared/components/shadcn-ui/switch";
+import { Label } from "@/src/shared/components/shadcn-ui/label";
 
 const ChatRoom = () => {
+  const { activeUserIds } = useActiveUserIdStore();
+
   const conversationActiveStore = useConversationActiveStore((state) => state);
   const { toast } = useToast();
   const [encryptionKey, setEncryptionKey] = useState<string>("");
@@ -49,6 +69,11 @@ const ChatRoom = () => {
   const { id: conversationId } = useParams();
   const unreadConversationStore = useUnreadConversationStore((state) => state);
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
+  const { conversationIsLocal, setConversationIsLocal } =
+    useConversationIsLocalStore();
+
+  const [isInLocal, setIsInLocal] = useState<boolean>(false);
+
   const {
     data: conversation,
     mutate,
@@ -117,8 +142,37 @@ const ChatRoom = () => {
       setOpenVerifyEncryptionKeyDialog(true);
     }
   }, [error]);
-  console.log(conversationActiveStore.conversations[conversationId]);
-  console.log(verifyEncryptionKey);
+
+  const onSetConversationToLocal = async () => {
+    if (!isInLocal) {
+      if (
+        activeUserIds.includes(
+          conversation?.endUserIds[0]._id !== myEndUserId
+            ? conversation?.endUserIds[0]._id
+            : conversation?.endUserIds[1]._id,
+        )
+      ) {
+        setIsInLocal(true);
+        setConversationIsLocal({
+          ...conversationIsLocal,
+          [conversationId]: true,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            "Other users must be online to set this conversation to peer to peer",
+        });
+      }
+    } else {
+      setIsInLocal(false);
+      setConversationIsLocal({
+        ...conversationIsLocal,
+        [conversationId]: false,
+      });
+    }
+  };
+
   return (
     <>
       {conversationActiveStore.conversations[conversationId] !==
@@ -161,14 +215,41 @@ const ChatRoom = () => {
               >
                 <LockClosedIcon />
               </Button>
+              {/* Set a (is local) property Dialog to make it private on your own computer or not */}
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="airplane-mode"
+                  checked={isInLocal}
+                  onCheckedChange={onSetConversationToLocal}
+                />
+                <Label htmlFor="airplane-mode">Private</Label>
+              </div>
+              {/* <AlertDialog>
+                <AlertDialogTrigger>
+                  <Button variant="ghost">
+                    <CircleIcon />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Do you want to set this conversation to local? (Required
+                      other users to be online as well, and if one of you is
+                      offline, then you won't be able to get new messages, those
+                      messages will be gone forever, so only use this if both
+                      want to have a private and short conversation)
+                    </AlertDialogTitle>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onSetConversationToLocal}>
+                      Set
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog> */}
               {/* Set encryption key */}
-              <Dialog
-                open={
-                  openEncryptionKeyDialog &&
-                  conversationActiveStore.conversations[conversationId] !==
-                    verifyEncryptionKey
-                }
-              >
+              <Dialog open={openEncryptionKeyDialog}>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Set Encryption Key</DialogTitle>

@@ -11,7 +11,6 @@ const COMMENT_PER_FETCH = 8;
 
 export function useFetchComments(props: props) {
   const getKey = (pageIndex: any, previousPageData: any) => {
-    console.log(pageIndex);
     //end of page?
     if (pageIndex && !previousPageData.length) return null;
     return `${GET_COMMENT_API_ENDPOINT}?limit=${
@@ -26,7 +25,6 @@ export function useFetchComments(props: props) {
 
   //concat all the pages together
   const comments: Comment[] = data ? [].concat(...data) : [];
-  console.log(data);
   const isLoadingMore =
     isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
   const isEmpty = data?.[0]?.length === 0;

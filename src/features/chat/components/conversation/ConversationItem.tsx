@@ -65,9 +65,7 @@ const ConversationItem = ({ conversation }: ConversationItemProps) => {
 
         <div
           className={`w-8 h-8 rounded-full ${hasActiveUser ? "bg-green-500" : "bg-gray-500"}`}
-        >
-          {hasActiveUser ? "On" : "Off"}
-        </div>
+        ></div>
       </div>
     </div>
   );

@@ -11,7 +11,6 @@ export default function useFetchRecommendGroups() {
     pageIndex: number,
     previousPageData: GroupWithMembershipInfo[],
   ) => {
-    console.log(pageIndex);
     //end of page?
     if (pageIndex && !previousPageData.length) return null;
     return (

@@ -11,6 +11,7 @@ import { TriangleLeftIcon } from "@radix-ui/react-icons";
 import SearchPage from "@/src/features/search/components/SearchPage";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import http from "@/src/shared/libs/axios/axios.base";
+
 const ConversationList = () => {
   const navigate = useNavigate();
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
@@ -45,9 +46,7 @@ const ConversationList = () => {
     console.log(error);
     return <div>{error.message}</div>;
   }
-  function handleCreateConversation() {
-    http.post;
-  }
+
   return (
     <ScrollArea className="h-full w-full bg-blue-600/50">
       <div className="border-b border-gray-200 ">

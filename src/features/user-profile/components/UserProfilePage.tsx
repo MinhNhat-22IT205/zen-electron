@@ -87,7 +87,6 @@ const UserProfilePage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Here you would typically send the updated user data to your backend
-    console.log("Updated user:", editedUser);
   };
 
   const handleLogout = () => {

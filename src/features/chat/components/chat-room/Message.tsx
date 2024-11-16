@@ -22,7 +22,6 @@ const Message = ({ message, previousMessage, seenMessage }: MessageProps) => {
   const myUserId = useAuthStore((state) => state.endUser?._id);
   const isMe = message.endUserId?._id === myUserId;
 
-  console.log("myUserId", myUserId, message.endUserId?._id, message.content);
   const messageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

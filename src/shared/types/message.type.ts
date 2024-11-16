@@ -16,4 +16,9 @@ type LivestreamMessage = {
   liveStreamId: string;
   createdAt: Date;
 };
-export { Message, LivestreamMessage };
+
+type MessageLocal = Message & {
+  iv: string;
+  authTag: string;
+};
+export { Message, LivestreamMessage, MessageLocal };

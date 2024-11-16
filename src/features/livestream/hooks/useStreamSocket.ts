@@ -64,37 +64,23 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   const [recording, setRecording] = useState<Recording | null>(null);
 
   const reset = () => {
-    console.log("Resetting connections and streams");
     cleanupLocalStream();
     cleanupPeerConnections();
     removeSocketListeners();
   };
   useEffect(() => {
-    console.log(
-      "clientSocket",
-      clientSocket,
-      document.getElementById("streamer"),
-    );
-
     if (!clientSocket) {
       return;
     }
     const initializeCall = async () => {
-      console.log("initializeCall", isHost);
       reset();
       setupSocketListeners();
       emitInitialRequest();
-      console.log("emitInitialRequest");
       if (isHost) await setupLocalStream();
     };
 
     //wait for ui to load
     setTimeout(() => {
-      console.log(
-        "clientSocket2",
-        clientSocket,
-        document.getElementById("streamer"),
-      );
       initializeCall();
     }, 1000);
 
@@ -130,7 +116,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   };
 
   const handleUserJoin = ({ fromEndUserId }: { fromEndUserId: string }) => {
-    console.log("User joined", fromEndUserId);
     createOffer(fromEndUserId);
   };
 
@@ -156,7 +141,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
     toEndUserId: string;
     data: any;
   }) => {
-    console.log("Message from peer type", type);
     switch (type) {
       case "offer":
         await createAnswer(fromEndUserId, data);
@@ -178,7 +162,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   };
 
   const setupLocalStream = async () => {
-    console.log("isHost", isHost);
     try {
       const stream =
         await navigator.mediaDevices.getUserMedia(MEDIA_CONSTRAINTS);
@@ -188,7 +171,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
       ) as HTMLVideoElement;
       if (localVideo) localVideo.srcObject = stream;
       localVideo.autoplay = true;
-      console.log("localStreamA", stream);
     } catch (error) {
       console.error("Error accessing media devices.", error);
     }
@@ -218,7 +200,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   const setupRemoteStream = (memberId: string) => {
     const remoteStream = new MediaStream();
     let remoteVideo = document.getElementById("streamer") as HTMLVideoElement;
-    console.log("remoteVideo1", remoteVideo);
     if (!remoteVideo) {
       remoteVideo = document.createElement("video");
       remoteVideo.className = "video-player";
@@ -230,7 +211,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
 
   const addLocalStreamTracks = async (peerConnection: RTCPeerConnection) => {
     if (!localStreamRef.current) {
-      console.log("media get!!!");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: {
@@ -272,7 +252,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
       remoteStream.addTrack(track);
     });
     const remoteVideo = document.getElementById("streamer") as HTMLVideoElement;
-    console.log("remoteVideo", remoteVideo);
     if (remoteVideo) {
       remoteVideo.srcObject = remoteStream;
       remoteVideo.autoplay = true;
@@ -315,7 +294,6 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
       await peerConnectionsRef.current[memberId]?.setRemoteDescription(answer);
       flushIceCandidates(memberId);
     }
-    console.log("addAnswer", memberId);
   };
 
   const handleIceCandidate = async (
@@ -389,12 +367,10 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
 
   const startRecording = async () => {
     if (isHost) {
-      console.log("startRecording", "localStream", localStreamRef.current);
       if (!localStreamRef.current) return;
       const newRecording = await startStreamRecord(localStreamRef.current);
       setRecording(newRecording);
     } else {
-      console.log("startRecording", "remoteStream", remoteStreamRef.current);
       if (!remoteStreamRef.current) return;
       const newRecording = await startStreamRecord(remoteStreamRef.current);
       setRecording(newRecording);

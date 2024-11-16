@@ -41,7 +41,6 @@ const useCallSocket = () => {
   );
 
   const reset = () => {
-    console.log("Resetting connections and streams");
     cleanupLocalStream();
     cleanupPeerConnections();
     removeRemoteVideos();
@@ -116,7 +115,6 @@ const useCallSocket = () => {
   }: {
     endUserId: string;
   }) => {
-    console.log("Request accepted", joinerId);
     createOffer(joinerId);
   };
 
@@ -139,7 +137,6 @@ const useCallSocket = () => {
     toEndUserId: string;
     data: any;
   }) => {
-    console.log("Message from peer type", type);
     switch (type) {
       case "offer":
         await createAnswer(fromEndUserId, data);
@@ -167,7 +164,6 @@ const useCallSocket = () => {
         await navigator.mediaDevices.getUserMedia(MEDIA_CONSTRAINTS);
       const localVideo = document.getElementById("user-1") as HTMLVideoElement;
       if (localVideo) localVideo.srcObject = localStreamRef.current;
-      console.log("localStream", localStreamRef.current);
     } catch (error) {
       console.error("Error accessing media devices.", error);
     }

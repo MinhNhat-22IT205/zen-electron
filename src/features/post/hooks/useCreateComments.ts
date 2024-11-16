@@ -23,7 +23,6 @@ export function useCreateComments(props: PropsType) {
   };
 
   const handleChangeReplyingComment = (comment: Comment) => {
-    console.log("cancel called");
     setReplyingComment(comment);
   };
 

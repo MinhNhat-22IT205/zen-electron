@@ -3,7 +3,10 @@ import useSWR from "swr";
 import { MESSAGE_API_ENDPOINT } from "../../api/chat-endpoints.api";
 import { useParams } from "react-router-dom";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
-import { Message as MessageType } from "@/src/shared/types/message.type";
+import {
+  MessageLocal,
+  Message as MessageType,
+} from "@/src/shared/types/message.type";
 import useChatSocket from "../../hooks/useChatSocket";
 import { ScrollArea } from "@/src/shared/components/shadcn-ui/scroll-area";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
@@ -22,22 +25,30 @@ import { Input } from "@/src/shared/components/shadcn-ui/input";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useRef, useState } from "react";
 import { getFileType } from "@/src/shared/helpers/get-file-type";
+import { useConversationIsLocalStore } from "@/src/shared/libs/zustand/conversation-is-local.zustand";
 
 const MessageList = () => {
   const { id } = useParams();
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [message, setMessage] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
+  const { conversationIsLocal } = useConversationIsLocalStore();
+  const { data: messagesFile, mutate: mutateMessagesFile } = useSWR(
+    myEndUserId && id ? ["messages", myEndUserId, id] : null,
+    () => window.api.getMessages(myEndUserId, id),
+  );
   const { data: messages, mutate } = useSWR<MessageType[]>(
     MESSAGE_API_ENDPOINT + `?limit=1000&skip=0&conversationId=${id}`,
     fetcher,
   );
 
-  const addMessageToUI = (message: MessageType) => {
+  const addMessageToUI = (message: any) => {
     mutate((prev) => [...prev, message], false);
+    mutateMessagesFile((prev) => [...prev, message], false);
   };
+
   const setSeen = (messageId: string) => {
     mutate((previousMessages) => {
       if (!previousMessages) return previousMessages;
@@ -56,6 +67,7 @@ const MessageList = () => {
 
   const { emitMessage, seenMessage, emitFileMessage } = useChatSocket({
     conversationId: id,
+    isLocal: conversationIsLocal[id] ?? false,
     uiControl: {
       addMessageToUI,
       setSeenToUI: setSeen,
@@ -98,18 +110,31 @@ const MessageList = () => {
     }
   };
 
+  function sendMessage(message: string) {
+    emitMessage(message, myEndUserId);
+  }
+
   return (
     <>
       <ScrollArea className="flex-1 h-full w-full">
         <div className="">
-          {messages?.map((message, index) => (
-            <Message
-              key={message._id}
-              message={message}
-              seenMessage={seenMessage}
-              previousMessage={index > 0 ? messages[index - 1] : null}
-            />
-          ))}
+          {conversationIsLocal[id]
+            ? messagesFile?.map((message, index) => (
+                <Message
+                  key={message._id}
+                  message={message}
+                  seenMessage={seenMessage}
+                  previousMessage={index > 0 ? messages[index - 1] : null}
+                />
+              ))
+            : messages?.map((message, index) => (
+                <Message
+                  key={message._id}
+                  message={message}
+                  seenMessage={seenMessage}
+                  previousMessage={index > 0 ? messages[index - 1] : null}
+                />
+              ))}
         </div>
       </ScrollArea>
       {/* Chat Input */}
@@ -135,10 +160,12 @@ const MessageList = () => {
             className="focus:!outline-none focus-visible:!ring-0 flex-1"
             type="text"
             placeholder="Type a message"
+            onChange={(e) => setMessage(e.currentTarget.value)}
+            value={message}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                emitMessage(e.currentTarget.value, myEndUserId);
-                e.currentTarget.value = "";
+                sendMessage(message);
+                setMessage("");
               }
             }}
           />
@@ -146,7 +173,9 @@ const MessageList = () => {
         <Button
           variant="ghost"
           onClick={() =>
-            selectedFile && emitFileMessage(selectedFile, myEndUserId)
+            selectedFile
+              ? emitFileMessage(selectedFile, myEndUserId)
+              : sendMessage(message)
           }
         >
           <PaperPlaneIcon className="w-4 h-4" />
