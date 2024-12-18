@@ -173,6 +173,7 @@ ipcMain.handle(
 ipcMain.handle(
   "GET_MESSAGES",
   async (event, userId: string, conversationId: string) => {
+    console.log(app.getPath("userData"));
     const messagesFile = path.join(
       app.getPath("userData"),
       "messages",

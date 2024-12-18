@@ -14,9 +14,9 @@ declare global {
         userId: string,
         conversationId: string,
       ) => Promise<MessageLocal[]>;
-      saveFile: (userId: string, file: Buffer, filename: string) => void;
-      getFile: (filePath: string) => void;
-      getUserFiles: (userId: string) => void;
+      saveFile: (userId: string, file: File, filename: string) => void;
+      getFile: (filePath: string) => Promise<File>;
+      getUserFiles: (userId: string) => Promise<File[]>;
     };
   }
 }

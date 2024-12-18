@@ -58,6 +58,13 @@ import {
 import { getImageDataObject } from "@/src/shared/helpers/get-image-data";
 import { useToast } from "@/src/shared/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import {
+  disableOtp,
+  generateQr,
+  verifyOtpToEnable2fa,
+} from "../../authentication/api/auth.api";
+import QrModal from "../../authentication/components/qrModal";
+import OtpModal from "../../authentication/components/otpModal";
 
 const UserProfilePage = () => {
   const { toast } = useToast();
@@ -67,26 +74,55 @@ const UserProfilePage = () => {
   const { endUser, isLoading } = useFetchEndUser(id);
   const [editedUser, setEditedUser] = useState(endUser);
   const [activeTab, setActiveTab] = useState("profile");
+  const [qr, setQr] = useState<string>("");
+  const [qrOpen, setQrOpen] = useState<boolean>(false);
+  const [otpOpen, setOtpOpen] = useState<boolean>(false);
+  const [otp, setOtp] = useState<string>("");
+  const [disableOtpOpen, setDisableOtpOpen] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setEditedUser((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSwitchChange = (name: string) => (checked: boolean) => {
-    setEditedUser((prev) => ({ ...prev, [name]: checked }));
-  };
 
   const handleStorageChange = (value: number[]) => {
     setEditedUser((prev) => ({ ...prev, storageUsed: value[0] }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would typically send the updated user data to your backend
+  const onHandle2fa = async (checked: boolean) => {
+    if (!endUser.otpEnabled) {
+      const result = await generateQr();
+      setQr(result.qrUrl);
+      setQrOpen(true);
+    } else {
+      setDisableOtpOpen(true);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const result = await verifyOtpToEnable2fa(otp, authStore.endUser.email);
+    if (result.otpEnabled) {
+      toast({
+        title: "Two-factor authentication enabled",
+        description: "You have successfully enabled two-factor authentication",
+      });
+      authStore.setEndUser(result);
+      setOtpOpen(false);
+      setOtp("");
+      setQrOpen(false);
+    } else {
+      setDisableOtpOpen(true);
+    }
+  };
+
+  const handleDisableOtp = async () => {
+    const result = await disableOtp(authStore.endUser.email, otp);
+    if (!result.otpEnabled) {
+      setDisableOtpOpen(false);
+      setOtpOpen(false);
+      setOtp("");
+      authStore.setEndUser(result);
+      toast({
+        title: "Two-factor authentication disabled",
+        description: "You have successfully disabled two-factor authentication",
+      });
+    }
   };
 
   const handleLogout = () => {
@@ -121,7 +157,7 @@ const UserProfilePage = () => {
 
   if (isLoading) return <div>Loading...</div>;
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
       <div className="w-full max-w-4xl">
         <div className="backdrop-blur-sm bg-white/70 dark:bg-gray-800/70 rounded-3xl shadow-xl overflow-hidden">
           <div className="p-8">
@@ -248,13 +284,7 @@ const UserProfilePage = () => {
                         <Label htmlFor="notifications">
                           Enable Notifications
                         </Label>
-                        <Switch
-                          id="notifications"
-                          checked={false}
-                          onCheckedChange={handleSwitchChange(
-                            "notificationsEnabled",
-                          )}
-                        />
+                        <Switch id="notifications" checked={false} />
                       </div>
                     </div>
                   </TabsContent>
@@ -266,10 +296,8 @@ const UserProfilePage = () => {
                         </Label>
                         <Switch
                           id="twoFactor"
-                          checked={false}
-                          onCheckedChange={handleSwitchChange(
-                            "twoFactorEnabled",
-                          )}
+                          checked={endUser.otpEnabled}
+                          onCheckedChange={onHandle2fa}
                         />
                       </div>
                       <Alert>
@@ -301,6 +329,28 @@ const UserProfilePage = () => {
           </div>
         </div>
       </div>
+      <QrModal
+        qr={qr}
+        open={qrOpen}
+        setOpen={setQrOpen}
+        setOtpOpen={setOtpOpen}
+      />
+      {/* Activate OTP */}
+      <OtpModal
+        open={otpOpen}
+        setOpen={setOtpOpen}
+        setOtp={setOtp}
+        onSubmit={handleVerifyOtp}
+        otp={otp}
+      />
+      {/* Disable OTP */}
+      <OtpModal
+        open={disableOtpOpen}
+        setOpen={setDisableOtpOpen}
+        setOtp={setOtp}
+        onSubmit={handleDisableOtp}
+        otp={otp}
+      />
     </div>
   );
 };

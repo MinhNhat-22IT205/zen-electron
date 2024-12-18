@@ -18,6 +18,7 @@ const useAuthStore = create<AuthStore>()(
       description: "",
       createdAt: "",
       updatedAt: "",
+      otpEnabled: false,
     },
     setEndUser: (endUser) => set({ endUser }),
     logout: () =>
@@ -31,6 +32,7 @@ const useAuthStore = create<AuthStore>()(
           description: "",
           createdAt: "",
           updatedAt: "",
+          otpEnabled: false,
         },
       }),
   })),

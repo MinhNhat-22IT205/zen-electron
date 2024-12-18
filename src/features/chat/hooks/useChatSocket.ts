@@ -26,7 +26,6 @@ export default function useChatSocket({
     if (!conversationId || !clientSocket) return;
 
     const handleSendMessage = (message: Message & { isLocal: boolean }) => {
-      console.log(message);
       if (message.isLocal && message.endUserId._id !== endUser._id) {
         window.api.saveMessage(endUser._id, {
           _id: Math.random().toString(),
@@ -40,7 +39,6 @@ export default function useChatSocket({
         });
       }
       if (message.conversationId === conversationId) {
-        console.log("IM IN HERE BUT UI DON'T DISPLAY");
         uiControl.addMessageToUI(message);
       } else {
         unreadConversationStore.addUnreadConversationId(message.conversationId);
@@ -92,16 +90,21 @@ export default function useChatSocket({
       messageId,
       conversationId,
       endUserId: endUser._id,
+      isLocal,
     });
   };
 
   const emitFileMessage = async (file: File, endUserId: string) => {
     const fileName = file.name;
+    if (isLocal) {
+      window.api.saveFile(endUser._id, file, fileName);
+    }
     clientSocket?.emit("sendFile", {
       file,
       fileName,
       endUserId,
       conversationId,
+      isLocal,
     });
   };
 

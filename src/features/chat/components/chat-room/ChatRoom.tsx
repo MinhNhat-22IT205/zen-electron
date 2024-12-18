@@ -224,32 +224,12 @@ const ChatRoom = () => {
                 />
                 <Label htmlFor="airplane-mode">Private</Label>
               </div>
-              {/* <AlertDialog>
-                <AlertDialogTrigger>
-                  <Button variant="ghost">
-                    <CircleIcon />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Do you want to set this conversation to local? (Required
-                      other users to be online as well, and if one of you is
-                      offline, then you won't be able to get new messages, those
-                      messages will be gone forever, so only use this if both
-                      want to have a private and short conversation)
-                    </AlertDialogTitle>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={onSetConversationToLocal}>
-                      Set
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog> */}
+
               {/* Set encryption key */}
-              <Dialog open={openEncryptionKeyDialog}>
+              <Dialog
+                open={openEncryptionKeyDialog}
+                onOpenChange={setOpenEncryptionKeyDialog.bind(null, false)}
+              >
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Set Encryption Key</DialogTitle>
