@@ -61,7 +61,6 @@ const ConversationList = () => {
         <ConversationItem key={conversation._id} conversation={conversation} />
       ))}
       <div className="flex flex-col  gap-2 justify-center items-center">
-        <Button>Create conversation</Button>
         <Button onClick={() => navigate(`/user-profile/${myEndUserId}`)}>
           User Setting
         </Button>

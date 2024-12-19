@@ -2,6 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { contextBridge, ipcRenderer } from "electron";
 import { Message, MessageLocal } from "./shared/types/message.type";
+import { EndUser } from "./shared/types/enduser.type";
 
 declare global {
   interface Window {
@@ -14,9 +15,15 @@ declare global {
         userId: string,
         conversationId: string,
       ) => Promise<MessageLocal[]>;
-      saveFile: (userId: string, file: File, filename: string) => void;
+      saveFile: (
+        userSent: EndUser,
+        userReceived: string,
+        file: string,
+        conversationId: string,
+      ) => void;
       getFile: (filePath: string) => Promise<File>;
       getUserFiles: (userId: string) => Promise<File[]>;
+      showNotification: (title: string, body: string, icon: string) => void;
     };
   }
 }
@@ -29,9 +36,22 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.invoke("SAVE_MESSAGE", userId, message),
   getMessages: (userId: string, conversationId: string) =>
     ipcRenderer.invoke("GET_MESSAGES", userId, conversationId),
-  saveFile: (userId: string, file: Buffer, filename: string) =>
-    ipcRenderer.invoke("SAVE_FILE", userId, file, filename),
+  saveFile: (
+    userSent: EndUser,
+    userReceived: string,
+    file: string,
+    conversationId: string,
+  ) =>
+    ipcRenderer.invoke(
+      "SAVE_FILE",
+      userSent,
+      userReceived,
+      file,
+      conversationId,
+    ),
   getFile: (filePath: string) => ipcRenderer.invoke("GET_FILE", filePath),
   getUserFiles: (userId: string) =>
     ipcRenderer.invoke("GET_USER_FILES", userId),
+  showNotification: (title: string, body: string, icon: string) =>
+    ipcRenderer.invoke("SHOW_NOTIFICATION", title, body, icon),
 });

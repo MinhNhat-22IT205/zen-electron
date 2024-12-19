@@ -107,13 +107,17 @@ const UserProfilePage = () => {
       setOtp("");
       setQrOpen(false);
     } else {
-      setDisableOtpOpen(true);
+      toast({
+        title: "Failed to enable two-factor authentication",
+        description: "Please try again",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDisableOtp = async () => {
     const result = await disableOtp(authStore.endUser.email, otp);
-    if (!result.otpEnabled) {
+    if (result.otpEnabled === false) {
       setDisableOtpOpen(false);
       setOtpOpen(false);
       setOtp("");
@@ -122,10 +126,17 @@ const UserProfilePage = () => {
         title: "Two-factor authentication disabled",
         description: "You have successfully disabled two-factor authentication",
       });
+    } else {
+      toast({
+        title: "Failed to disable two-factor authentication",
+        description: "Please try again",
+        variant: "destructive",
+      });
     }
   };
 
   const handleLogout = () => {
+    console.log("logout");
     authStore.logout();
     navigate("/auth/login");
   };
@@ -154,7 +165,6 @@ const UserProfilePage = () => {
       description: "Your profile has been updated successfully",
     });
   };
-
   if (isLoading) return <div>Loading...</div>;
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
@@ -165,7 +175,7 @@ const UserProfilePage = () => {
               <CardHeader>
                 <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                   <Avatar className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-white dark:ring-gray-800 shadow-lg">
-                    <AvatarImage src={endUser.avatar} alt={endUser.username} />
+                    <AvatarImage src={IMAGE_BASE_URL+endUser.avatar} alt={endUser.username} />
                     <AvatarFallback>
                       {endUser.username.slice(0, 2).toUpperCase()}
                     </AvatarFallback>

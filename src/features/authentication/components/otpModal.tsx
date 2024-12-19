@@ -32,6 +32,10 @@ export default function OtpModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
+        <h1>
+          Type the number on your authenticator app to verify that you have
+          successfully logged in
+        </h1>
         <InputOTP maxLength={6} value={otp} onChange={(value) => setOtp(value)}>
           <InputOTPGroup>
             <InputOTPSlot index={0} />

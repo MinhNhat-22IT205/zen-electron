@@ -3,6 +3,10 @@ import { Message } from "@/src/shared/types/message.type";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useUnreadConversationStore } from "@/src/shared/libs/zustand/unread-conversation.zustand";
 import { useSocketStore } from "@/src/shared/libs/zustand/socket-instance.zustand";
+import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
+import fileToBase64 from "@/src/shared/helpers/convertBase64";
+import e from "express";
+import { getEndUser } from "../../authentication/api/auth.api";
 
 interface UseChatSocketProps {
   conversationId: string;
@@ -26,18 +30,48 @@ export default function useChatSocket({
     if (!conversationId || !clientSocket) return;
 
     const handleSendMessage = (message: Message & { isLocal: boolean }) => {
-      if (message.isLocal && message.endUserId._id !== endUser._id) {
+      if (message.endUserId._id !== endUser._id) {
+        window.api.showNotification(
+          "Tin nhắn của " + message.endUserId.username,
+          message.content,
+          IMAGE_BASE_URL + message.endUserId.avatar,
+        );
+      }
+      console.log("The message is", message);
+      if (
+        message.isLocal &&
+        message.endUserId._id !== endUser._id &&
+        message.type === "text"
+      ) {
         window.api.saveMessage(endUser._id, {
           _id: Math.random().toString(),
           content: message.content,
-          type: "text",
+          type: message.type,
           createdAt: new Date(),
           visibility: "normal",
           read: false,
           conversationId: conversationId,
           endUserId: message.endUserId,
         });
+      } else if (
+        message.isLocal &&
+        message.endUserId._id !== endUser._id &&
+        message.type === "file"
+      ) {
+        console.log("message content ", message.content);
+        window.api.saveFile(
+          // @ts-ignore
+          message.endUserId,
+          endUser._id,
+          // @ts-ignore
+          message.content,
+          message.conversationId,
+        );
       }
+      console.log(
+        "is the same conversationid",
+        message.conversationId === conversationId,
+      );
       if (message.conversationId === conversationId) {
         uiControl.addMessageToUI(message);
       } else {
@@ -94,10 +128,26 @@ export default function useChatSocket({
     });
   };
 
+  const toBase64: any = (file: File) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+    });
+
   const emitFileMessage = async (file: File, endUserId: string) => {
     const fileName = file.name;
+    const fileBase64: string = await toBase64(file);
+    console.log("THE FILE NHAT ASKED FOR BITCH", file);
     if (isLocal) {
-      window.api.saveFile(endUser._id, file, fileName);
+      // @ts-ignore
+      window.api.saveFile(
+        endUser,
+        endUser._id,
+        fileBase64.split(",")[1],
+        conversationId,
+      );
     }
     clientSocket?.emit("sendFile", {
       file,

@@ -3,10 +3,7 @@ import useSWR from "swr";
 import { MESSAGE_API_ENDPOINT } from "../../api/chat-endpoints.api";
 import { useParams } from "react-router-dom";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
-import {
-  MessageLocal,
-  Message as MessageType,
-} from "@/src/shared/types/message.type";
+import { Message as MessageType } from "@/src/shared/types/message.type";
 import useChatSocket from "../../hooks/useChatSocket";
 import { ScrollArea } from "@/src/shared/components/shadcn-ui/scroll-area";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
@@ -26,6 +23,7 @@ import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useRef, useState } from "react";
 import { getFileType } from "@/src/shared/helpers/get-file-type";
 import { useConversationIsLocalStore } from "@/src/shared/libs/zustand/conversation-is-local.zustand";
+import MessageLocal from "./MessageLocal";
 
 const MessageList = () => {
   const { id } = useParams();
@@ -120,7 +118,7 @@ const MessageList = () => {
         <div className="">
           {conversationIsLocal[id]
             ? messagesFile?.map((message, index) => (
-                <Message
+                <MessageLocal
                   key={message._id}
                   message={message}
                   seenMessage={seenMessage}

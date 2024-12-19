@@ -20,5 +20,6 @@ type LivestreamMessage = {
 type MessageLocal = Message & {
   iv: string;
   authTag: string;
+  content: string | File;
 };
 export { Message, LivestreamMessage, MessageLocal };

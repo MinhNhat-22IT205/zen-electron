@@ -98,6 +98,15 @@ const verifyOtpToEnable2fa = async (
   }
 };
 
+const getEndUser = async (endUserId: string): Promise<EndUser> => {
+  try {
+    const result = await http.get<EndUser>(`/endusers/${endUserId}`);
+    return result.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
 export {
   checkAccount,
   login,
@@ -106,4 +115,5 @@ export {
   verifyOtpToEnable2fa,
   checkOtp,
   disableOtp,
+  getEndUser,
 };
