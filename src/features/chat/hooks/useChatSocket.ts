@@ -31,8 +31,9 @@ export default function useChatSocket({
 
     const handleSendMessage = (message: Message & { isLocal: boolean }) => {
       if (message.endUserId._id !== endUser._id) {
+        const localMessage = isLocal ? " ở secret conversation" : "";
         window.api.showNotification(
-          "Tin nhắn của " + message.endUserId.username,
+          "Tin nhắn của " + message.endUserId.username + localMessage,
           message.content,
           IMAGE_BASE_URL + message.endUserId.avatar,
         );

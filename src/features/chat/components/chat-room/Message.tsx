@@ -11,13 +11,43 @@ import {
 import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
 import FileDisplay from "@/src/shared/components/FileDisplay";
 import { getFileType } from "@/src/shared/helpers/get-file-type";
+import {
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "@/src/shared/components/shadcn-ui/context";
 
 type MessageProps = {
   message: MessageType;
   previousMessage: MessageType | null;
   seenMessage: (messageId: string) => void;
+  emitDeleteMessage: (
+    messageId: string,
+    conversationId: string,
+  ) => Promise<void>;
+  emitChangeMessage: (
+    content: string,
+    messageId: string,
+    conversationId: string,
+  ) => Promise<void>;
 };
-const Message = ({ message, previousMessage, seenMessage }: MessageProps) => {
+const Message = ({
+  message,
+  previousMessage,
+  seenMessage,
+  emitChangeMessage,
+  emitDeleteMessage,
+}: MessageProps) => {
   const { isOpen, toggle } = useDisclosure(false);
   const myUserId = useAuthStore((state) => state.endUser?._id);
   const isMe = message.endUserId?._id === myUserId;
@@ -76,25 +106,45 @@ const Message = ({ message, previousMessage, seenMessage }: MessageProps) => {
               </Avatar>
             </div>
           )}
-          <div
-            onClick={toggle}
-            className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${message.type != "text" && "!bg-white"} ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
-          >
-            {message.type === "text" ? (
-              message.content
-            ) : getFileType(message.content) !== "image" ? (
-              <FileDisplay
-                filename={message.content.split(" ").pop()}
-                fileUrl={IMAGE_BASE_URL + message.content}
-              />
-            ) : (
-              <img
-                src={IMAGE_BASE_URL + message.content}
-                className="w-40 h-40"
-                alt="file"
-              />
-            )}
-          </div>
+          <ContextMenu>
+            <ContextMenuTrigger>
+              <div
+                onClick={toggle}
+                className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${message.type != "text" && "!bg-white"} ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
+              >
+                {message.type === "text" ? (
+                  message.content
+                ) : getFileType(message.content) !== "image" ? (
+                  <FileDisplay
+                    filename={message.content.split(" ").pop()}
+                    fileUrl={IMAGE_BASE_URL + message.content}
+                  />
+                ) : (
+                  <img
+                    src={IMAGE_BASE_URL + message.content}
+                    className="w-40 h-40"
+                    alt="file"
+                  />
+                )}
+              </div>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuItem
+                onClick={() =>
+                  emitDeleteMessage(message._id, message.conversationId)
+                }
+              >
+                Delete
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() =>
+                  emitChangeMessage("ASD", message._id, message.conversationId)
+                }
+              >
+                Change
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         </div>
       </div>
       {isOpen && (

@@ -20,12 +20,14 @@ import {
 } from "@radix-ui/react-icons";
 import { Input } from "@/src/shared/components/shadcn-ui/input";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getFileType } from "@/src/shared/helpers/get-file-type";
 import { useConversationIsLocalStore } from "@/src/shared/libs/zustand/conversation-is-local.zustand";
 import MessageLocal from "./MessageLocal";
+import { useSocketStore } from "@/src/shared/libs/zustand/socket-instance.zustand";
 
 const MessageList = () => {
+  const { socket: clientSocket } = useSocketStore();
   const { id } = useParams();
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -112,6 +114,62 @@ const MessageList = () => {
     emitMessage(message, myEndUserId);
   }
 
+  const emitDeleteMessage = async (
+    messageId: string,
+    conversationId: string,
+  ) => {
+    clientSocket?.emit("deleteMessage", {
+      messageId,
+      conversationId,
+      endUserId: myEndUserId,
+    });
+  };
+
+  const emitChangeMessage = async (
+    content: string,
+    messageId: string,
+    conversationId: string,
+  ) => {
+    clientSocket?.emit("changeMessage", {
+      content,
+      messageId,
+      conversationId,
+      endUserId: myEndUserId,
+    });
+  };
+
+  const handleDeleteMessage = (data: MessageType) => {
+    mutate(
+      messages.filter((message) => {
+        return message._id !== data._id;
+      }),
+    );
+  };
+
+  const handleChangeMessage = (data: MessageType) => {
+    mutate(
+      messages.map((message) => {
+        if (
+          message._id === data._id &&
+          message.conversationId === data.conversationId
+        ) {
+          message.content = data.content;
+        }
+        return message;
+      }),
+    );
+  };
+
+  useEffect(() => {
+    clientSocket.on("deleteMessage", handleDeleteMessage);
+    clientSocket.on("changeMessage", handleChangeMessage);
+
+    return () => {
+      clientSocket.off("deleteMessage", handleDeleteMessage);
+      clientSocket.off("changeMessage", handleChangeMessage);
+    };
+  }, []);
+
   return (
     <>
       <ScrollArea className="flex-1 h-full w-full">
@@ -131,6 +189,8 @@ const MessageList = () => {
                   message={message}
                   seenMessage={seenMessage}
                   previousMessage={index > 0 ? messages[index - 1] : null}
+                  emitDeleteMessage={emitDeleteMessage}
+                  emitChangeMessage={emitChangeMessage}
                 />
               ))}
         </div>
