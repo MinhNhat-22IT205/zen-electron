@@ -138,19 +138,26 @@ const MessageList = () => {
     });
   };
 
-  const handleDeleteMessage = (data: MessageType) => {
+  const handleDeleteMessage = (data: {
+    messageId: string;
+    conversationId: string;
+  }) => {
     mutate(
       messages.filter((message) => {
-        return message._id !== data._id;
+        return message._id !== data.messageId;
       }),
     );
   };
 
-  const handleChangeMessage = (data: MessageType) => {
+  const handleChangeMessage = (data: {
+    content: string;
+    messageId: string;
+    conversationId: string;
+  }) => {
     mutate(
       messages.map((message) => {
         if (
-          message._id === data._id &&
+          message._id === data.messageId &&
           message.conversationId === data.conversationId
         ) {
           message.content = data.content;
