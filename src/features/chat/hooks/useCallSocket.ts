@@ -4,7 +4,6 @@ import { useSocketStore } from "@/src/shared/libs/zustand/socket-instance.zustan
 import { EndUser } from "@/src/shared/types/enduser.type";
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Socket } from "socket.io-client";
 
 const ICE_SERVERS = {
   iceServers: [
@@ -139,12 +138,15 @@ const useCallSocket = () => {
   }) => {
     switch (type) {
       case "offer":
+        // tạo answer để đáp lại offer
         await createAnswer(fromEndUserId, data);
         break;
       case "answer":
+        // lấy answer của đối phương để xác nhận
         await addAnswer(fromEndUserId, data);
         break;
       case "candidate":
+        // nhận candidate của đối phương.
         await handleIceCandidate(fromEndUserId, data);
         break;
     }
@@ -172,13 +174,13 @@ const useCallSocket = () => {
   const createOffer = async (joinerId: string) => {
     await createPeerConnection(joinerId);
     const offer = await peerConnectionsRef.current[joinerId]?.createOffer();
-    await peerConnectionsRef.current[joinerId]?.setLocalDescription(offer);
+    await peerConnectionsRef.current[joinerId]?.setLocalDescription(offer); // đã chạy setLocalDescription, lúc này sẽ bắt đầu gửi ICE Candidate đi
 
     emitCallMessage("offer", joinerId, offer);
   };
 
   const createPeerConnection = async (memberId: string) => {
-    const peerConnection = new RTCPeerConnection(ICE_SERVERS);
+    const peerConnection = new RTCPeerConnection(ICE_SERVERS); // lúc này là được nhận ICE candidate, nhưng chưa gửi đi vì chưa chạy setLocalDescription
     peerConnectionsRef.current[memberId] = peerConnection;
     peerConnectionsRef.current[memberId].pendingCandidates = [];
 
@@ -199,6 +201,7 @@ const useCallSocket = () => {
     document.getElementById("user-1")?.classList.add("smallFrame");
   };
 
+  // đang gửi đi cho người kia.
   const addLocalStreamTracks = async (peerConnection: RTCPeerConnection) => {
     if (!localStreamRef.current) {
       localStreamRef.current = await navigator.mediaDevices.getUserMedia({
@@ -213,16 +216,21 @@ const useCallSocket = () => {
     });
   };
 
+  // nhận track thằng kia gửi tới.
   const setupPeerConnectionListeners = (
     peerConnection: RTCPeerConnection,
     memberId: string,
   ) => {
     peerConnection.ontrack = handleTrack(memberId);
+    // chạy socket khi mà nhận được ice candidate của mình để gửi cho đối phương.
+    // ban đầu sẽ chưa chạy bởi vì trong createOffer hoặc createAnswer là createPeerConnection chạy trước
+    // nghĩa là lúc này chưa có setLocalDescription, sinh ra việc hàm onicecandidate sẽ chưa chạy.
     peerConnection.onicecandidate = handleIceCandidateEvent(memberId);
     peerConnection.oniceconnectionstatechange =
       handleIceConnectionStateChange(memberId);
   };
 
+  // event là các track người khác gửi cho mình để mình setup ra để mình thấy.
   const handleTrack = (memberId: string) => (event: RTCTrackEvent) => {
     const remoteStream = new MediaStream();
     event.streams[0].getTracks().forEach((track) => {
@@ -232,13 +240,14 @@ const useCallSocket = () => {
     if (remoteVideo) remoteVideo.srcObject = remoteStream;
   };
 
+  // khi nhận được iceCandidate, gửi liền cho đối phương
   const handleIceCandidateEvent =
     (memberId: string) => (event: RTCPeerConnectionIceEvent) => {
       if (event.candidate) {
         emitCallMessage("candidate", memberId, event.candidate);
       }
     };
-
+  // flush candidate
   const handleIceConnectionStateChange = (memberId: string) => () => {
     if (
       peerConnectionsRef.current[memberId].iceConnectionState === "connected"
@@ -247,6 +256,7 @@ const useCallSocket = () => {
     }
   };
 
+  // Tạo ra answer trả lời, gửi luôn ICE candidate nhận được song song
   const createAnswer = async (
     memberId: string,
     offer: RTCSessionDescriptionInit,
@@ -270,6 +280,7 @@ const useCallSocket = () => {
     }
   };
 
+  // nhận IceCandidate và add vào, nhưng nếu chưa có remote Description thì bỏ vào pending Candidates để dành cho flush
   const handleIceCandidate = async (
     fromEndUserId: string,
     candidate: RTCIceCandidate,
@@ -278,7 +289,7 @@ const useCallSocket = () => {
     if (peerConnection) {
       if (!peerConnection.remoteDescription) {
         peerConnection.pendingCandidates?.push(candidate);
-        return;
+        return; // dừng lại ở đây.
       }
       try {
         await peerConnection.addIceCandidate(candidate);
@@ -288,6 +299,7 @@ const useCallSocket = () => {
     }
   };
 
+  // Dùng để addIceCandidate còn thừa ở handleIceCandidate
   const flushIceCandidates = async (memberId: string) => {
     const peerConnection = peerConnectionsRef.current[memberId];
     if (peerConnection && peerConnection.pendingCandidates) {
