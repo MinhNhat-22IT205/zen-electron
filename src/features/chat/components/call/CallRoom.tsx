@@ -6,11 +6,34 @@ import {
   CameraIcon,
   ExitIcon,
   SpeakerModerateIcon,
+  OpenInNewWindowIcon,
 } from "@radix-ui/react-icons";
+import { useState } from "react";
+import { useDisclosure } from "@/src/shared/hooks/use-disclosure";
+import ScreenShareListDialog from "@/src/shared/components/ScreenShareListDialog";
 
 const CallRoom = () => {
   const location = useLocation();
-  const { leaveChannel, toggleCamera, toggleMic } = useCallSocket();
+  const {
+    leaveChannel,
+    toggleCamera,
+    toggleMic,
+    startScreenShare,
+    stopScreenShare,
+    getScreenShareSources,
+    isSharingScreen,
+  } = useCallSocket();
+
+  const {
+    isOpen: isShareDialogOpen,
+    open: openShareDialog,
+    close: closeShareDialog,
+  } = useDisclosure();
+
+  const [screenShareSources, setScreenShareSources] = useState<
+    Electron.DesktopCapturerSource[]
+  >([]);
+
   return (
     //newly initialize page whenever got redirected into
     <div key={location.pathname} className="w-screen h-screen relative">
@@ -45,6 +68,22 @@ const CallRoom = () => {
           <SpeakerModerateIcon className="w-4 h-4 text-white" />
         </div>
         <div
+          className="control-container p-3 rounded-full flex items-center justify-center cursor-pointer transition transform hover:bg-gray-700 hover:scale-105 shadow-lg"
+          id="share-btn"
+          onClick={() => {
+            if (isSharingScreen) {
+              stopScreenShare();
+            } else {
+              getScreenShareSources().then((sources) => {
+                setScreenShareSources(sources);
+                openShareDialog();
+              });
+            }
+          }}
+        >
+          <OpenInNewWindowIcon className="w-4 h-4 text-white" />
+        </div>
+        <div
           className="control-container bg-red-600 p-3 rounded-full flex items-center justify-center cursor-pointer transition transform hover:bg-red-700 hover:scale-105 shadow-lg"
           id="leave-btn"
           onClick={leaveChannel}
@@ -52,6 +91,16 @@ const CallRoom = () => {
           <ExitIcon className="w-4 h-4 text-white" />
         </div>
       </div>
+
+      <ScreenShareListDialog
+        isOpen={isShareDialogOpen}
+        onClose={closeShareDialog}
+        sources={screenShareSources}
+        onSourceSelect={(source) => {
+          startScreenShare(source.id);
+          closeShareDialog();
+        }}
+      />
     </div>
   );
 };

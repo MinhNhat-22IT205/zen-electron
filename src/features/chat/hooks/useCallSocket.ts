@@ -2,7 +2,7 @@ import { useToast } from "@/src/shared/hooks/use-toast";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useSocketStore } from "@/src/shared/libs/zustand/socket-instance.zustand";
 import { EndUser } from "@/src/shared/types/enduser.type";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 const ICE_SERVERS = {
@@ -33,6 +33,7 @@ const useCallSocket = () => {
   const isSender = searchParams.get("isSender") === "true";
   const myEndUser = useAuthStore((state) => state.endUser);
   const { socket: clientSocket } = useSocketStore();
+  const [isSharingScreen, setIsSharingScreen] = useState(false);
 
   const localStreamRef = useRef<MediaStream | null>(null);
   const peerConnectionsRef = useRef<{ [key: string]: CustomRTCPeerConnection }>(
@@ -247,6 +248,7 @@ const useCallSocket = () => {
         emitCallMessage("candidate", memberId, event.candidate);
       }
     };
+
   // flush candidate
   const handleIceConnectionStateChange = (memberId: string) => () => {
     if (
@@ -349,7 +351,102 @@ const useCallSocket = () => {
   const toggleCamera = () => toggleTrack("video");
   const toggleMic = () => toggleTrack("audio");
 
-  return { leaveChannel, toggleCamera, toggleMic };
+  // Get available screen share sources
+  const getScreenShareSources = async (): Promise<
+    Electron.DesktopCapturerSource[]
+  > => {
+    try {
+      const sources = await window.electron.getSources();
+      return sources;
+    } catch (error) {
+      console.error("Error getting screen share sources:", error);
+      return [];
+    }
+  };
+
+  // Start screen sharing with selected source
+  const startScreenShare = async (selectedScreenSourceId: string) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          // @ts-ignore
+          mandatory: {
+            chromeMediaSource: "desktop",
+            chromeMediaSourceId: selectedScreenSourceId,
+            minWidth: 1280,
+            maxWidth: 1280,
+            minHeight: 720,
+            maxHeight: 720,
+          },
+        },
+      });
+
+      const videoElement = document.getElementById(
+        "user-1",
+      ) as HTMLVideoElement;
+      videoElement.srcObject = stream;
+
+      // Replace video track in all peer connections
+      const screenTrack = stream.getVideoTracks()[0];
+      if (screenTrack) {
+        Object.values(peerConnectionsRef.current).forEach((peerConnection) => {
+          peerConnection.getSenders().forEach((sender) => {
+            if (sender.track?.kind === "video") {
+              sender.replaceTrack(screenTrack);
+            }
+          });
+        });
+      }
+
+      localStreamRef.current = stream;
+      setIsSharingScreen(true);
+    } catch (error) {
+      console.error("Start screen share error:", error);
+    }
+  };
+
+  // Stop screen sharing and switch back to webcam
+  const stopScreenShare = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+
+      const videoElement = document.getElementById(
+        "user-1",
+      ) as HTMLVideoElement;
+      videoElement.srcObject = stream;
+
+      // Replace screen share track with webcam track
+      const videoTrack = stream.getVideoTracks()[0];
+      if (videoTrack) {
+        Object.values(peerConnectionsRef.current).forEach((peerConnection) => {
+          peerConnection.getSenders().forEach((sender) => {
+            if (sender.track?.kind === "video") {
+              sender.replaceTrack(videoTrack);
+            }
+          });
+        });
+      }
+
+      localStreamRef.current = stream;
+      setIsSharingScreen(false);
+    } catch (error) {
+      console.error("Stop screen share error:", error);
+    }
+  };
+
+  return {
+    leaveChannel,
+    toggleCamera,
+    toggleMic,
+    startScreenShare,
+    stopScreenShare,
+    getScreenShareSources,
+    isSharingScreen,
+  };
 };
 
 export default useCallSocket;
