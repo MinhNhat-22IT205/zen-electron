@@ -11,13 +11,14 @@ export const ListItemWithAvatar: React.FC<{
     React.ReactElement<typeof ItemInfo>,
     React.ReactElement<typeof ItemAction>,
   ];
-}> = ({ avatarSrc, avatarFallback, className, children }) => {
+  onClick?: () => void;
+}> = ({ avatarSrc, avatarFallback, className, children, onClick }) => {
   const [itemInfo, itemAction] = React.Children.toArray(children);
 
   return (
     <Card className={cn("p-3", className)}>
       <div className="flex justify-between space-x-4 w-full">
-        <Avatar>
+        <Avatar className="cursor-pointer" onClick={onClick}>
           <AvatarImage src={avatarSrc} />
           <AvatarFallback>{avatarFallback}</AvatarFallback>
         </Avatar>

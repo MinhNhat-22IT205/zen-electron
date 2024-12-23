@@ -113,7 +113,7 @@ const MessageList = () => {
         </div>
       </ScrollArea>
       {/* Chat Input */}
-      <div className="flex px-2 py-2">
+      <div className="flex px-2">
         {selectedFile ? (
           <div className="flex-1 flex items-center gap-2 border rounded-md p-2">
             {getFileType(selectedFile.name) === "image" ? (
@@ -153,7 +153,7 @@ const MessageList = () => {
         </Button>
       </div>
       {/* File send control panel */}
-      <div className="flex items-center py-1 px-4 gap-2">
+      <div className="flex items-center py-1 px-4">
         <input
           type="file"
           ref={fileInputRef}
@@ -162,13 +162,10 @@ const MessageList = () => {
         />
         <Button
           variant="ghost"
-          className="!p-1 !h-5"
+          size="icon"
           onClick={() => fileInputRef.current?.click()}
         >
           <ImageIcon className="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" className="!p-1 !h-5">
-          <Link2Icon className="w-4 h-4" />
         </Button>
       </div>
     </>

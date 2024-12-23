@@ -96,14 +96,14 @@ const LeftSidebar = () => {
             <Text>Chats</Text>
           </Link>
         </Button>
+     
         <Button
           variant="ghost"
           className="w-full flex justify-start space-x-3"
           asChild
         >
-          <Link to="/notification" className="flex items-center gap-2">
-            {/* <BellIcon className="w-5 h-5" /> */}
-            <Text>Notificaiton</Text>
+          <Link to="/pomodoro" className="flex items-center gap-2">
+            <Text>Pomodoro</Text>
           </Link>
         </Button>
         <Button

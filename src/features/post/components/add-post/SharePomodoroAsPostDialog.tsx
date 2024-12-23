@@ -22,29 +22,51 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/src/shared/components/shadcn-ui/textarea";
 import { getImageDataArray } from "@/src/shared/helpers/get-image-data";
 import { addPost } from "../../api/post.api";
+import { usePomodoroStore } from "@/src/shared/libs/zustand/pomodoro-settings";
 
-type AddPostDialogProps = {
+type SharePomodoroAsPostDialogProps = {
   isOpen: boolean;
   close: () => void;
   onChange: (isOpen: boolean) => void;
 };
 
-const AddPostDialog = ({ isOpen, onChange, close }: AddPostDialogProps) => {
+const SharePomodoroAsPostDialog = ({
+  isOpen,
+  onChange,
+  close,
+}: SharePomodoroAsPostDialogProps) => {
   const navigate = useNavigate();
-  const [previews, setPreviews] = useState<string[]>([]);
-  const [previewType, setPreviewType] = useState<string[]>([]);
+  const {
+    totalTimeSpent,
+    sessionLength,
+    breakLength,
+    youtubeVideoId,
+    youtubeVideoTitle,
+  } = usePomodoroStore();
 
   const form = useForm<ztAddPostInputs>({
     resolver: zodResolver(zAddPostInputs),
     defaultValues: {
-      title: "",
-      body: "",
+      title: "Productive Pomodoro session sharing",
+      body: `I just completed a ${sessionLength}-minute Pomodoro session! 🎯 \nCompleted a total of ${Math.max(
+        1,
+        Math.floor(totalTimeSpent / 60),
+      )} minutes today. Feeling super productive! \n🚀Listening to: ${
+        youtubeVideoTitle ? youtubeVideoTitle : "Lofi Study Mix"
+      } \n🎶How about you? You can try my settings to stay focused and achieve your goals! 🌟`,
       images: [],
     },
   });
 
   const onSubmit = async (values: ztAddPostInputs) => {
-    await addPost(values);
+    let postfix = `<pomodoro>${JSON.stringify({
+      sessionLength,
+      breakLength,
+      youtubeVideoId,
+      youtubeVideoTitle,
+    })}</pomodoro>`;
+    await addPost({ ...values, body: values.body + postfix });
+    navigate("/feeds");
     close();
   };
 
@@ -85,54 +107,18 @@ const AddPostDialog = ({ isOpen, onChange, close }: AddPostDialogProps) => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="images"
-              render={({ field: { onChange, value, ...rest } }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      multiple
-                      {...rest}
-                      onChange={(event) => {
-                        const { files, displayUrls } = getImageDataArray(event);
-                        setPreviews(displayUrls);
-                        console.log(
-                          "displayUrls",
-                          Array.from(files).map((file) => file.type),
-                        );
-                        setPreviewType(
-                          Array.from(files).map((file) => file.type),
-                        );
-                        onChange(Array.from(files));
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {previews.length > 0 &&
-              previewType.some((type) => type.startsWith("image")) && (
-                <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-900">
-                    Image Previews
-                  </h3>
-                  <div className="mt-2 grid grid-cols-3 gap-2">
-                    {previews.map((src, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={src}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-full object-cover rounded"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            <div className="flex items-center gap-2 border rounded-md p-2">
+              <div className="space-y-2 flex-1">
+                <h4 className="text-sm font-medium">Pomodoro Settings Used:</h4>
+                <ul className="text-sm text-muted-foreground">
+                  <li>Session Length: {sessionLength} minutes</li>
+                  <li>Break Length: {breakLength} minutes</li>
+                  <li>YouTube Video: {youtubeVideoTitle}</li>
+                </ul>
+              </div>
+              {/* <Button variant="ghost">Use settings</Button> */}
+            </div>
+
             <Button className="w-full mt-4" type="submit">
               Submit
             </Button>
@@ -143,4 +129,4 @@ const AddPostDialog = ({ isOpen, onChange, close }: AddPostDialogProps) => {
   );
 };
 
-export default AddPostDialog;
+export default SharePomodoroAsPostDialog;

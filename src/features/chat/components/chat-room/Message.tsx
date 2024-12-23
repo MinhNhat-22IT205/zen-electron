@@ -22,7 +22,6 @@ const Message = ({ message, previousMessage, seenMessage }: MessageProps) => {
   const myUserId = useAuthStore((state) => state.endUser?._id);
   const isMe = message.endUserId?._id === myUserId;
 
-  console.log("myUserId", myUserId, message.endUserId?._id, message.content);
   const messageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,7 +85,7 @@ const Message = ({ message, previousMessage, seenMessage }: MessageProps) => {
             ) : getFileType(message.content) !== "image" ? (
               <FileDisplay
                 filename={message.content.split(" ").pop()}
-                fileUrl={message.content}
+                fileUrl={IMAGE_BASE_URL + message.content}
               />
             ) : (
               <img

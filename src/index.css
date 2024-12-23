@@ -38,7 +38,7 @@ body {
   height: 170px;
   width: 300px;
   border-radius: 5px;
-  border:2px solid #b366f9;
+  border:2px solid #000;
   -webkit-box-shadow: 3px 3px 15px -1px rgba(0,0,0,0.77);
   box-shadow: 3px 3px 15px -1px rgba(0,0,0,0.77);
   z-index: 999;
@@ -55,9 +55,9 @@ body {
 
 
 .control-container{
-background-color: rgba(107, 114, 128, 0.9);
-padding: 12px;
-border-radius: 50%;
+background-color: #f3f4f6;
+padding: 15px 16px;
+border-radius: 8px;
 display: flex;
 justify-content: center;
 align-items: center;

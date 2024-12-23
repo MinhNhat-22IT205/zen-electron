@@ -38,6 +38,7 @@ import CreateGroupPostDialog from "./CreateGroupPostDialog";
 import GroupPostList from "./GroupPostList";
 import { createGroupRequest } from "../api/group-request.api";
 import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
+import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 
 const GroupIdPage = () => {
   const { id: groupId } = useParams();
@@ -47,6 +48,9 @@ const GroupIdPage = () => {
     fetcher,
   );
   const { group, isJoined, numOfMembers } = data || {};
+  const isOwner = useAuthStore(
+    (state) => state.endUser?._id === group?.endUserId,
+  );
   const [hasSentJoinRequest, setHasSentJoinRequest] = useState(isJoined);
 
   const handleJoinGroup = async () => {
@@ -92,9 +96,13 @@ const GroupIdPage = () => {
             <Button
               variant={hasSentJoinRequest ? "outline" : "default"}
               className="w-full"
-              onClick={handleJoinGroup}
+              onClick={!hasSentJoinRequest && handleJoinGroup}
             >
-              {hasSentJoinRequest ? "Leave Group" : "Join Group"}
+              {isJoined
+                ? "Leave Group"
+                : hasSentJoinRequest
+                  ? "Request Sent"
+                  : "Join Group"}
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -105,7 +113,11 @@ const GroupIdPage = () => {
               <DropdownMenuContent className="w-64">
                 <DropdownMenuLabel>Group Details</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    navigate(`/groups/${groupId}/members?isOwner=${isOwner}`)
+                  }
+                >
                   <PersonIcon className="mr-2 h-4 w-4" />
                   <span>{numOfMembers} members</span>
                 </DropdownMenuItem>
@@ -134,9 +146,8 @@ const GroupIdPage = () => {
             {isJoined && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="mx-2">
+                  <Button variant="outline" className="mx-2">
                     <DotsHorizontalIcon className="h-4 w-4" />
-                    <h1> </h1>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>

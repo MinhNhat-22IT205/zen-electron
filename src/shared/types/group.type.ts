@@ -28,7 +28,13 @@ type YourGroupData = {
   groupsCreated: (Group & { endUser: EndUserMinimal })[];
 };
 
-type GroupMember = EndUserMinimal & { isOwner: boolean };
+// type GroupMember = EndUserMinimal & { isOwner: boolean };
+type GroupMember = {
+  endUser: EndUserMinimal;
+  groupId: string;
+  _id: string;
+  createdAt: string;
+};
 
 export {
   Group,

@@ -14,17 +14,19 @@ import { IMAGE_BASE_URL } from "@/src/shared/constants/base-paths";
 import { EndUser } from "@/src/shared/types/enduser.type";
 import { CalendarIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 type EnduserSearchItemProps = {
   endUser: EndUser;
 };
 
 const EnduserSearchItem = ({ endUser }: EnduserSearchItemProps) => {
+  const navigate = useNavigate();
   return (
     <ListItemWithAvatar
       avatarSrc={IMAGE_BASE_URL + endUser.avatar}
       avatarFallback={endUser.username}
+      onClick={() => navigate("/user-profile/" + endUser._id)}
     >
       <ItemInfo>
         <h4 className="text-sm font-semibold">{endUser.username}</h4>

@@ -20,6 +20,8 @@ import PostIdPage from "../features/post/components/post-id/PostIdPage";
 import GroupPage from "../features/group/components/GroupPage";
 import GroupIdPage from "../features/group/components/GroupIdPage";
 import JoinGroupRequestList from "../features/group/components/group-request/JoinGroupRequestList";
+import GroupMemberList from "../features/group/components/group-member/GroupMemberList";
+import PomodoroPage from "../features/pomodoro/components/page";
 const AppRoutes = () => {
   return (
     <>
@@ -60,8 +62,10 @@ const AppRoutes = () => {
               path="groups/:id/requests"
               element={<JoinGroupRequestList />}
             />
+            <Route path="groups/:id/members" element={<GroupMemberList />} />
             <Route path="search" element={<SearchPage />} />
             <Route path="user-profile/:id" element={<UserProfilePage />} />
+            <Route path="pomodoro" element={<PomodoroPage />} />
           </Route>
 
           {/* Chat page */}

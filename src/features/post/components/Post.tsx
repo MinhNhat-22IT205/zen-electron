@@ -22,12 +22,27 @@ import { useNavigate } from "react-router-dom";
 import LikeButton from "./like/LikeButton";
 import OpenCommentButton from "./comment/OpenCommentButton";
 import PostImages from "./PostImages";
+import { usePomodoroStore } from "@/src/shared/libs/zustand/pomodoro-settings";
 type PostProps = {
   post: PostJson;
 };
 
 const Post = ({ post }: PostProps) => {
   const navigate = useNavigate();
+  const { setPomodoroSettings } = usePomodoroStore();
+  const isPomodoroPost = post.body.includes("<pomodoro>");
+  const pomodoroSettings = isPomodoroPost
+    ? JSON.parse(post.body.match(/<pomodoro>(.*)<\/pomodoro>/)?.[1] || "{}")
+    : {};
+  const postBody = isPomodoroPost
+    ? post.body.replace(/<pomodoro>.*<\/pomodoro>/, "")
+    : post.body;
+
+  const handleUsePomodoroSettings = () => {
+    console.log(pomodoroSettings);
+    setPomodoroSettings(pomodoroSettings);
+    navigate("/pomodoro");
+  };
 
   return (
     <>
@@ -51,14 +66,35 @@ const Post = ({ post }: PostProps) => {
               </Text>
             </div>
             <div className="flex-1 justify-end flex">
-              <Button variant="ghost">
+             {/* <Button variant="ghost">
                 <DotsHorizontalIcon className=" h-4 w-4" />
-              </Button>
+              </Button>*/}
             </div>
           </div>
 
           <Text className="font-bold text-2xl">{post.title}</Text>
-          <Text>{post.body}</Text>
+          <Text className="my-4">{postBody}</Text>
+          {isPomodoroPost && (
+            <div className="bg-zinc-900/90 p-8 rounded-[32px] shadow-2xl w-[360px] text-white backdrop-blur-sm">
+              <h2 className="text-center text-2xl font-light mb-6 tracking-wide">
+                Pomodoro Settings Used:
+              </h2>
+              <ul className="text-sm text-muted-foreground">
+                <li>
+                  Session Length: {pomodoroSettings.sessionLength} minutes
+                </li>
+                <li>Break Length: {pomodoroSettings.breakLength} minutes</li>
+                <li>YouTube Video: {pomodoroSettings.youtubeVideoTitle}</li>
+              </ul>
+              <Button
+                className="w-full "
+                variant="ghost"
+                onClick={handleUsePomodoroSettings}
+              >
+                Use settings
+              </Button>
+            </div>
+          )}
           <PostImages images={post.images} />
           <div className="flex justify-between items-center">
             <LikeButton
@@ -67,13 +103,13 @@ const Post = ({ post }: PostProps) => {
               postId={post._id}
             />
             <OpenCommentButton post={post} />
-            <Button variant="ghost">
+            {/*<Button variant="ghost">
               <Share1Icon className="h-4 w-4 mr-2" />
-            </Button>
+            </Button>*/}
             <div className="flex-1" />
-            <Button variant="ghost">
+            {/*<Button variant="ghost">
               <BookmarkIcon className="h-4 w-4" />
-            </Button>
+            </Button>*/}
           </div>
         </CardContent>
       </Card>

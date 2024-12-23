@@ -19,6 +19,7 @@ interface FileDisplayProps {
 }
 
 export default function FileDisplay({ filename, fileUrl }: FileDisplayProps) {
+  console.log("fileUrl", fileUrl);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,7 +62,9 @@ export default function FileDisplay({ filename, fileUrl }: FileDisplayProps) {
           >
             <a
               href={fileUrl}
-              download={filename}
+              // this forces the browser to download the file
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center justify-center"
             >
               <DownloadIcon className="h-4 w-4" />
