@@ -7,10 +7,11 @@ import { CONVERSTAION_API_ENDPOINT } from "../../api/chat-endpoints.api";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
-import { TriangleLeftIcon } from "@radix-ui/react-icons";
+import { TriangleLeftIcon, GearIcon } from "@radix-ui/react-icons";
 import SearchPage from "@/src/features/search/components/SearchPage";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import http from "@/src/shared/libs/axios/axios.base";
+import Text from "@/src/shared/components/shadcn-ui/text";
 
 const ConversationList = () => {
   const navigate = useNavigate();
@@ -24,7 +25,6 @@ const ConversationList = () => {
   } = useSWR<Conversation[]>(
     CONVERSTAION_API_ENDPOINT + "?limit=1000&skip=0",
     fetcher,
-    // { refreshInterval: 1000 },
   );
 
   useEffect(() => {
@@ -40,32 +40,51 @@ const ConversationList = () => {
   }, [isLoading, id]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Text className="text-amber-600">Loading conversations...</Text>
+      </div>
+    );
   }
+
   if (error) {
     console.log(error);
-    return <div>{error.message}</div>;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Text className="text-red-600">{error.message}</Text>
+      </div>
+    );
   }
 
   return (
-    <ScrollArea className="h-full w-full bg-blue-600/50">
-      <div className="border-b border-gray-200 ">
-        <div className="m-3">
-          <SearchPage />
-        </div>
-        {/* <Button variant="link" onClick={() => navigate("/feeds")}>
-          <TriangleLeftIcon className="w-4 h-4" /> Back
-        </Button> */}
+    <div className="h-full flex flex-col bg-gradient-to-b from-amber-50 to-white">
+      <div className="p-4 border-b border-amber-200 bg-white/80 backdrop-blur-sm shadow-sm">
+        <Text className="font-bold text-xl text-amber-800 mb-4">Messages</Text>
+        <SearchPage />
       </div>
-      {conversations?.map((conversation: Conversation) => (
-        <ConversationItem key={conversation._id} conversation={conversation} />
-      ))}
-      <div className="flex flex-col  gap-2 justify-center items-center">
-        <Button onClick={() => navigate(`/user-profile/${myEndUserId}`)}>
-          User Setting
+
+      <ScrollArea className="flex-1">
+        <div className="space-y-1">
+          {conversations?.map((conversation: Conversation) => (
+            <ConversationItem
+              key={conversation._id}
+              conversation={conversation}
+            />
+          ))}
+        </div>
+      </ScrollArea>
+
+      <div className="p-4 border-t border-amber-200 bg-white/80 backdrop-blur-sm">
+        <Button
+          onClick={() => navigate(`/user-profile/${myEndUserId}`)}
+          variant="ghost"
+          className="w-full hover:bg-amber-100 text-amber-700"
+        >
+          <GearIcon className="mr-2 h-4 w-4" />
+          Settings
         </Button>
       </div>
-    </ScrollArea>
+    </div>
   );
 };
 

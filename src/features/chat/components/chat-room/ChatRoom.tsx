@@ -180,77 +180,95 @@ const ChatRoom = () => {
         <Dialog open={openVerifyEncryptionKeyDialog}>
           <DialogTrigger>
             <Button variant="ghost">
-              <LockClosedIcon />
+              <LockClosedIcon className="text-amber-500" />
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-white/95 backdrop-blur-sm border border-amber-200">
             <DialogHeader>
-              <DialogTitle>Verify Encryption Key</DialogTitle>
+              <DialogTitle className="text-2xl font-bold text-amber-600">
+                Verify Encryption Key
+              </DialogTitle>
               <DialogDescription>
-                <h1>
-                  Because you are using encryption key, please verify your key
+                <h1 className="text-gray-600 mb-4">
+                  Please verify your encryption key to continue
                 </h1>
                 <Input
                   type="password"
                   value={verifyEncryptionKey}
                   onChange={(e) => setVerifyEncryptionKey(e.target.value)}
+                  className="border-amber-200 focus:border-amber-400"
                 />
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button onClick={onVerifyEncryptionKey}>Verify</Button>
+              <Button
+                onClick={onVerifyEncryptionKey}
+                className="bg-amber-500 hover:bg-amber-600"
+              >
+                Verify
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       ) : (
-        <div className="w-full h-full flex flex-col">
-          <div className="flex justify-between items-center p-2 border-b">
-            <Text className="flex-1 font-bold">
+        <div className="w-full h-full flex flex-col bg-gradient-to-b from-amber-200 to-white">
+          <div className="flex justify-between items-center p-4 border-b border-amber-200 bg-white/80 backdrop-blur-sm shadow-sm">
+            <Text className="flex-1 font-bold text-xl text-amber-800">
               {getConversationName(conversation?.endUserIds, myEndUserId)}
             </Text>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between space-x-2">
               <Button
                 variant="ghost"
                 onClick={() => setOpenEncryptionKeyDialog(true)}
+                className="hover:bg-amber-100"
               >
-                <LockClosedIcon />
+                <LockClosedIcon className="text-amber-600" />
               </Button>
-              {/* Set a (is local) property Dialog to make it private on your own computer or not */}
-              <div className="flex items-center space-x-2">
+
+              <div className="flex items-center space-x-2 px-3 py-1 bg-amber-50 rounded-full">
                 <Switch
                   id="airplane-mode"
                   checked={isInLocal}
                   onCheckedChange={onSetConversationToLocal}
+                  className="data-[state=checked]:bg-amber-500"
                 />
-                <Label htmlFor="airplane-mode">Private</Label>
+                <Label htmlFor="airplane-mode" className="text-amber-700">
+                  Private
+                </Label>
               </div>
 
-              {/* Set encryption key */}
               <Dialog
                 open={openEncryptionKeyDialog}
                 onOpenChange={setOpenEncryptionKeyDialog.bind(null, false)}
               >
-                <DialogContent>
+                <DialogContent className="bg-white/95 backdrop-blur-sm border border-amber-200">
                   <DialogHeader>
-                    <DialogTitle>Set Encryption Key</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold text-amber-600">
+                      Set Encryption Key
+                    </DialogTitle>
                     <DialogDescription>
                       <Input
                         type="password"
                         value={encryptionKey}
                         onChange={(e) => setEncryptionKey(e.target.value)}
+                        className="border-amber-200 focus:border-amber-400"
                       />
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
-                    <Button onClick={onChangeEncryptionKey}>Set</Button>
+                    <Button
+                      onClick={onChangeEncryptionKey}
+                      className="bg-amber-500 hover:bg-amber-600"
+                    >
+                      Set
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
 
-              {/* Call Icon */}
               <Button
                 variant="ghost"
-                className="rounded-full"
+                className="rounded-full hover:bg-amber-100"
                 onClick={() =>
                   navigate(
                     `/call-room?conversationId=${conversationId}&isSender=true`,
@@ -258,7 +276,7 @@ const ChatRoom = () => {
                 }
               >
                 <svg
-                  fill="#000000"
+                  fill="#f59e0b"
                   height="20px"
                   width="20px"
                   version="1.1"
@@ -284,11 +302,11 @@ const ChatRoom = () => {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost">
-                    <DotsHorizontalIcon />
+                  <Button variant="ghost" className="hover:bg-amber-100">
+                    <DotsHorizontalIcon className="text-amber-600" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="bg-white/95 backdrop-blur-sm border border-amber-200">
                   <AddRoomMemberDialog
                     currentRoomMembers={conversation?.endUserIds}
                     mutateMemberList={mutate}

@@ -50,74 +50,131 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="w-[45rem] bg-gray-50 flex flex-col text-center p-4 rounded-lg shadow-md gap-4">
-      <h1 className="font-bold text-2xl">Create your new account</h1>
+    <div className="w-[45rem] bg-white/90 backdrop-blur-sm flex flex-col p-8 rounded-2xl shadow-lg gap-6 border border-amber-100">
+      <div className="space-y-2">
+        <h1 className="font-bold text-4xl bg-gradient-to-r from-amber-600 to-amber-400 bg-clip-text text-transparent">
+          Join the Conversation
+        </h1>
+        <p className="text-amber-600/80">Create your account to get started</p>
+      </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Username" {...field} />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Email" {...field} />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input type="password" placeholder="Password" {...field} />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Confirm password"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button className="w-full" variant={"default"} type="submit">
-            Submit
-          </Button>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-left text-sm font-medium text-amber-700">
+                Username
+              </h2>
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder="Choose a username"
+                        className="border-amber-200 focus:border-amber-400 h-11"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-left text-sm font-medium text-amber-700">
+                Email
+              </h2>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your email"
+                        className="border-amber-200 focus:border-amber-400 h-11"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-left text-sm font-medium text-amber-700">
+                Password
+              </h2>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Create a password"
+                        className="border-amber-200 focus:border-amber-400 h-11"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-left text-sm font-medium text-amber-700">
+                Confirm Password
+              </h2>
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Confirm your password"
+                        className="border-amber-200 focus:border-amber-400 h-11"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 pt-2">
+            <Button
+              className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white h-11 rounded-lg font-medium transition-all duration-200"
+              type="submit"
+            >
+              Create Account
+            </Button>
+            <div className="flex items-center justify-center gap-2 text-sm">
+              <span className="text-gray-500">Already have an account?</span>
+              <Button
+                variant="link"
+                onClick={() => navigate("/auth/login")}
+                className="text-amber-600 hover:text-amber-700 p-0 h-auto font-medium"
+              >
+                Sign In
+              </Button>
+            </div>
+          </div>
         </form>
       </Form>
-      <Button variant={"link"} onClick={() => navigate("/auth/login")}>
-        Login
-      </Button>
     </div>
   );
 };

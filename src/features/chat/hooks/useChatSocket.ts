@@ -140,7 +140,6 @@ export default function useChatSocket({
   const emitFileMessage = async (file: File, endUserId: string) => {
     const fileName = file.name;
     const fileBase64: string = await toBase64(file);
-    console.log("THE FILE NHAT ASKED FOR BITCH", file);
     if (isLocal) {
       // @ts-ignore
       window.api.saveFile(

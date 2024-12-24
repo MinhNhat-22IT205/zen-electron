@@ -167,21 +167,33 @@ const UserProfilePage = () => {
   };
   if (isLoading) return <div>Loading...</div>;
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-100 animate-gradient-y flex items-center justify-center">
       <div className="w-full max-w-4xl">
-        <div className="backdrop-blur-sm bg-white/70 dark:bg-gray-800/70 rounded-3xl shadow-xl overflow-hidden">
+        <div className="backdrop-blur-sm bg-white border border-amber-200 rounded-3xl shadow-xl overflow-hidden">
           <div className="p-8">
+            <div className="mb-6">
+              <Button
+                variant="ghost"
+                onClick={() => window.history.back()}
+                className="hover:bg-amber-100"
+              >
+                ← Back
+              </Button>
+            </div>
             <Card className="border-0 shadow-none bg-transparent">
               <CardHeader>
                 <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                  <Avatar className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-white dark:ring-gray-800 shadow-lg">
-                    <AvatarImage src={IMAGE_BASE_URL+endUser.avatar} alt={endUser.username} />
+                  <Avatar className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-white shadow-lg">
+                    <AvatarImage
+                      src={IMAGE_BASE_URL + endUser.avatar}
+                      alt={endUser.username}
+                    />
                     <AvatarFallback>
                       {endUser.username.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-center sm:text-left">
-                    <CardTitle className="text-2xl sm:text-3xl font-bold">
+                    <CardTitle className="text-2xl sm:text-3xl font-bold text-amber-800">
                       {endUser.username}
                     </CardTitle>
                     <CardDescription className="mt-1">
@@ -222,9 +234,9 @@ const UserProfilePage = () => {
                                     const { file, displayUrl } =
                                       getImageDataObject(event);
                                     setPreviews(displayUrl);
-
                                     onChange(file);
                                   }}
+                                  className="border-amber-200 focus:border-amber-400 file:bg-amber-500 file:text-white file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4 file:hover:bg-amber-600 cursor-pointer hover:border-amber-400 transition-colors duration-200"
                                 />
                               </FormControl>
                               <FormDescription />
@@ -238,7 +250,11 @@ const UserProfilePage = () => {
                           render={({ field }) => (
                             <FormItem>
                               <FormControl>
-                                <Input placeholder="Username" {...field} />
+                                <Input
+                                  placeholder="Username"
+                                  {...field}
+                                  className="border-amber-200 focus:border-amber-400"
+                                />
                               </FormControl>
                               <FormDescription />
                               <FormMessage />
@@ -254,6 +270,7 @@ const UserProfilePage = () => {
                                 <Textarea
                                   placeholder="Description.."
                                   {...field}
+                                  className="border-amber-200 focus:border-amber-400"
                                 />
                               </FormControl>
                               <FormDescription />
@@ -263,8 +280,7 @@ const UserProfilePage = () => {
                         />
 
                         <Button
-                          className="w-full"
-                          variant={"default"}
+                          className="w-full bg-amber-500 hover:bg-amber-600"
                           type="submit"
                         >
                           Submit
@@ -311,7 +327,6 @@ const UserProfilePage = () => {
                         />
                       </div>
                       <Alert>
-                        {/* <AlertCircle className="h-4 w-4" /> */}
                         <AlertTitle>Important</AlertTitle>
                         <AlertDescription>
                           Enabling two-factor authentication significantly
@@ -326,12 +341,11 @@ const UserProfilePage = () => {
                 <Button
                   variant="outline"
                   onClick={() => setActiveTab("profile")}
+                  className="hover:bg-amber-100"
                 >
-                  {/* <User className="w-4 h-4 mr-2" /> */}
                   View Profile
                 </Button>
                 <Button variant="destructive" onClick={handleLogout}>
-                  {/* <LogOut className="w-4 h-4 mr-2" /> */}
                   Logout
                 </Button>
               </CardFooter>

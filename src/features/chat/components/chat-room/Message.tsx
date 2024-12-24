@@ -154,7 +154,7 @@ const Message = ({
               <ContextMenuTrigger>
                 <div
                   onClick={toggle}
-                  className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${message.type != "text" && "!bg-white"} ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
+                  className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${message.type != "text" && "bg-transparent"} ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
                 >
                   {message.type === "text" ? (
                     message.content
@@ -166,7 +166,7 @@ const Message = ({
                   ) : (
                     <img
                       src={IMAGE_BASE_URL + message.content}
-                      className="w-40 h-40"
+                      className="w-40 h-40 bg-transparent rounded-xl"
                       alt="file"
                     />
                   )}
