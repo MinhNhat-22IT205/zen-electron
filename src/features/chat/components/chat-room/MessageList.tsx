@@ -43,7 +43,7 @@ const MessageList = () => {
     MESSAGE_API_ENDPOINT + `?limit=1000&skip=0&conversationId=${id}`,
     fetcher,
   );
-
+  console.log("messages", messages);
   const addMessageToUI = (message: any) => {
     mutate((prev) => [...prev, message], false);
     mutateMessagesFile((prev) => [...prev, message], false);
@@ -142,11 +142,10 @@ const MessageList = () => {
     messageId: string;
     conversationId: string;
   }) => {
-    mutate(
-      messages.filter((message) => {
-        return message._id !== data.messageId;
-      }),
-    );
+    mutate((prevMessages) => {
+      if (prevMessages == null) return prevMessages;
+      return prevMessages.filter((message) => message._id !== data.messageId);
+    });
   };
 
   const handleChangeMessage = (data: {
@@ -154,8 +153,9 @@ const MessageList = () => {
     messageId: string;
     conversationId: string;
   }) => {
-    mutate(
-      messages.map((message) => {
+    mutate((prevMessages) => {
+      if (prevMessages == null) return prevMessages;
+      return prevMessages.map((message) => {
         if (
           message._id === data.messageId &&
           message.conversationId === data.conversationId
@@ -163,8 +163,8 @@ const MessageList = () => {
           message.content = data.content;
         }
         return message;
-      }),
-    );
+      });
+    });
   };
 
   useEffect(() => {

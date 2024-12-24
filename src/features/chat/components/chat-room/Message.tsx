@@ -29,6 +29,7 @@ import {
 import { Input } from "@/src/shared/components/shadcn-ui/input";
 import { Label } from "@/src/shared/components/shadcn-ui/label";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
+import { useToast } from "@/src/shared/hooks/use-toast";
 type MessageProps = {
   message: MessageType;
   previousMessage: MessageType | null;
@@ -50,6 +51,7 @@ const Message = ({
   emitChangeMessage,
   emitDeleteMessage,
 }: MessageProps) => {
+  const { toast } = useToast();
   const { isOpen, toggle } = useDisclosure(false);
   const [openChangingText, setOpenChangingText] = useState(false);
   const [text, setText] = useState("");
@@ -172,13 +174,31 @@ const Message = ({
               </ContextMenuTrigger>
               <ContextMenuContent>
                 <ContextMenuItem
-                  onClick={() =>
-                    emitDeleteMessage(message._id, message.conversationId)
-                  }
+                  onClick={() => {
+                    if (isMe) {
+                      emitDeleteMessage(message._id, message.conversationId);
+                    } else {
+                      toast({
+                        title: "You are not the sender of this message",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
                 >
                   Delete
                 </ContextMenuItem>
-                <ContextMenuItem onClick={() => setOpenChangingText(true)}>
+                <ContextMenuItem
+                  onClick={() => {
+                    if (isMe) {
+                      setOpenChangingText(true);
+                    } else {
+                      toast({
+                        title: "You are not the sender of this message",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
                   Change
                 </ContextMenuItem>
               </ContextMenuContent>

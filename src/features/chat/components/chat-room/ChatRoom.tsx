@@ -191,7 +191,7 @@ const ChatRoom = () => {
                   Because you are using encryption key, please verify your key
                 </h1>
                 <Input
-                  type="text"
+                  type="password"
                   value={verifyEncryptionKey}
                   onChange={(e) => setVerifyEncryptionKey(e.target.value)}
                 />
@@ -235,7 +235,7 @@ const ChatRoom = () => {
                     <DialogTitle>Set Encryption Key</DialogTitle>
                     <DialogDescription>
                       <Input
-                        type="text"
+                        type="password"
                         value={encryptionKey}
                         onChange={(e) => setEncryptionKey(e.target.value)}
                       />
