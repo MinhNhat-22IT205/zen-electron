@@ -142,12 +142,7 @@ export default function useChatSocket({
     const fileBase64: string = await toBase64(file);
     if (isLocal) {
       // @ts-ignore
-      window.api.saveFile(
-        endUser,
-        endUser._id,
-        fileBase64.split(",")[1],
-        conversationId,
-      );
+      window.api.saveFile(endUser, endUser._id, fileBase64, conversationId);
     }
     clientSocket?.emit("sendFile", {
       file,
@@ -155,6 +150,7 @@ export default function useChatSocket({
       endUserId,
       conversationId,
       isLocal,
+      content: fileBase64,
     });
   };
 

@@ -85,12 +85,13 @@ const MessageLocal = ({
           >
             {message.type === "text" ? (
               message.content
-            ) : (
-              <img
-                src={"data:image/jpeg;base64," + message.content}
-                className="w-40 h-40"
-                alt="file"
+            ) : message.content.startsWith("data:application", 0) ? (
+              <FileDisplay
+                filename={"File được gửi"}
+                fileUrl={message.content}
               />
+            ) : (
+              <img src={message.content} className="w-40 h-40" alt="file" />
             )}
           </div>
         </div>

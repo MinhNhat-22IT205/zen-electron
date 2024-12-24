@@ -53,6 +53,7 @@ import { useActiveUserIdStore } from "@/src/shared/libs/zustand/active-user.zust
 import { useConversationIsLocalStore } from "@/src/shared/libs/zustand/conversation-is-local.zustand";
 import { Switch } from "@/src/shared/components/shadcn-ui/switch";
 import { Label } from "@/src/shared/components/shadcn-ui/label";
+import LeaveRoomDialog from "./LeaveRoomDialog";
 
 const ChatRoom = () => {
   const { activeUserIds } = useActiveUserIdStore();
@@ -312,6 +313,7 @@ const ChatRoom = () => {
                     mutateMemberList={mutate}
                   />
                   <RoomMemberDialog chatMembers={conversation?.endUserIds} />
+                  <LeaveRoomDialog onLeave={() => {}} />
                   <FilesDialog conversationId={conversationId} />
                 </DropdownMenuContent>
               </DropdownMenu>

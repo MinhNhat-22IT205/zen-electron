@@ -237,11 +237,16 @@ const MessageList = () => {
         )}
         <Button
           variant="ghost"
-          onClick={() =>
-            selectedFile
-              ? emitFileMessage(selectedFile, myEndUserId)
-              : sendMessage(message)
-          }
+          onClick={() => {
+            if (selectedFile) {
+              emitFileMessage(selectedFile, myEndUserId);
+              setSelectedFile(null);
+              setPreviewUrl(null);
+            } else {
+              sendMessage(message);
+              setMessage("");
+            }
+          }}
         >
           <PaperPlaneIcon className="w-4 h-4" />
         </Button>
