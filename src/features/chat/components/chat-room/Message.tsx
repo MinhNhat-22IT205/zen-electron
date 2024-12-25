@@ -24,12 +24,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/src/shared/components/shadcn-ui/dialog";
 import { Input } from "@/src/shared/components/shadcn-ui/input";
 import { Label } from "@/src/shared/components/shadcn-ui/label";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
 import { useToast } from "@/src/shared/hooks/use-toast";
+
 type MessageProps = {
   message: MessageType;
   previousMessage: MessageType | null;
@@ -44,6 +44,7 @@ type MessageProps = {
     conversationId: string,
   ) => Promise<void>;
 };
+
 const Message = ({
   message,
   previousMessage,
@@ -62,17 +63,17 @@ const Message = ({
 
   useEffect(() => {
     const element = messageRef.current;
-    if (!element) return; // Ensure element exists
+    if (!element) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !message.read && !isMe) {
-          seenMessage(message._id); // Call the function when visible
+          seenMessage(message._id);
         }
       },
       {
-        threshold: 0.1, // 10% visibility required
-        rootMargin: "0px 0px -20px 0px", // Start observing slightly before full visibility
+        threshold: 0.1,
+        rootMargin: "0px 0px -20px 0px",
       },
     );
 
@@ -80,50 +81,47 @@ const Message = ({
 
     return () => {
       if (element) {
-        observer.unobserve(element); // Cleanup observer when component unmounts or element changes
+        observer.unobserve(element);
       }
     };
   }, [message._id, seenMessage]);
-  console.log(openChangingText);
+
   return (
     <div>
-      {openChangingText && (
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">Change message</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Change message</DialogTitle>
-              <DialogDescription>We just change message</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="message" className="text-right">
-                  message
-                </Label>
-                <Input
-                  id="message"
-                  defaultValue=""
-                  onChange={(e) => setText(e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
+      <Dialog open={openChangingText} onOpenChange={setOpenChangingText}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Change message</DialogTitle>
+            <DialogDescription>Edit your message</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="message" className="text-right">
+                Message
+              </Label>
+              <Input
+                id="message"
+                defaultValue={message.content}
+                onChange={(e) => setText(e.target.value)}
+                className="col-span-3"
+              />
             </div>
-            <DialogFooter>
-              <Button
-                type="submit"
-                onClick={() => {
-                  emitChangeMessage(text, message._id, message.conversationId);
-                  setOpenChangingText(false);
-                }}
-              >
-                Save changes
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+          </div>
+          <DialogFooter>
+            <Button
+              type="submit"
+              onClick={() => {
+                emitChangeMessage(text, message._id, message.conversationId);
+                setOpenChangingText(false);
+                setTimeout(() => (document.body.style.pointerEvents = ""), 500); // cách sửa ảo đá, nhưng hoạt động.
+              }}
+            >
+              Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div
         ref={messageRef}
         className={`flex flex-col p-2 ${isMe ? "items-end " : "items-start "}`}
@@ -132,7 +130,7 @@ const Message = ({
           {!isMe &&
             (!previousMessage ||
               previousMessage.endUserId._id !== message.endUserId._id) && (
-              <p className="text-sm text-gray-500 ml-10">
+              <p className="text-sm text-amber-500 ml-10">
                 {message.endUserId?.username}
               </p>
             )}
@@ -154,7 +152,7 @@ const Message = ({
               <ContextMenuTrigger>
                 <div
                   onClick={toggle}
-                  className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${message.type != "text" && "bg-transparent"} ${isMe ? " bg-blue-500 text-white !rounded-br-none" : " bg-gray-200 !rounded-bl-none"}`}
+                  className={`px-2.5 py-1.5 rounded-xl cursor-pointer ${message.type != "text" && "bg-transparent"} ${isMe ? "bg-gradient-to-r from-amber-500 to-amber-400 text-white !rounded-br-none hover:from-amber-600 hover:to-amber-500" : "bg-gradient-to-r from-amber-50 to-white !rounded-bl-none hover:from-amber-100 hover:to-amber-50"}`}
                 >
                   {message.type === "text" ? (
                     message.content
@@ -172,8 +170,9 @@ const Message = ({
                   )}
                 </div>
               </ContextMenuTrigger>
-              <ContextMenuContent>
+              <ContextMenuContent className="bg-gradient-to-r from-amber-50 to-white border-amber-200">
                 <ContextMenuItem
+                  className="hover:bg-amber-100 text-amber-700 focus:bg-amber-100 focus:text-amber-800"
                   onClick={() => {
                     if (isMe) {
                       emitDeleteMessage(message._id, message.conversationId);
@@ -188,6 +187,7 @@ const Message = ({
                   Delete
                 </ContextMenuItem>
                 <ContextMenuItem
+                  className="hover:bg-amber-100 text-amber-700 focus:bg-amber-100 focus:text-amber-800"
                   onClick={() => {
                     if (isMe) {
                       setOpenChangingText(true);
@@ -207,13 +207,13 @@ const Message = ({
         </div>
         {isOpen && (
           <div
-            className={`flex justify-end text-sm text-gray-500 ${!isMe && "ml-10"}`}
+            className={`flex justify-end text-sm text-amber-500 ${!isMe && "ml-10"}`}
           >
             {formatMessageTimestamp(new Date(message.createdAt))}
           </div>
         )}
         {isOpen && isMe && (
-          <div className="flex justify-end text-sm text-gray-500">
+          <div className="flex justify-end text-sm text-amber-500">
             {message.read ? "Received" : "Sent"}
           </div>
         )}

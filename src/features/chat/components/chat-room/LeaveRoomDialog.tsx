@@ -24,15 +24,20 @@ const LeaveRoomDialog = ({ onLeave }: LeaveRoomDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { conversationId } = useParams();
   const endUser = useAuthStore((state) => state.endUser);
-  const conversations = useConversationActiveStore(
-    (state) => state.conversations,
-  );
+  const stateConversationActive = useConversationActiveStore((state) => state);
 
   const handleLeave = async () => {
     try {
       setIsLoading(true);
-      await http.patch(`/conversation/${conversationId}/leave`, {
-        conversationId,
+      const conversation = await http.patch(
+        `/conversation/${conversationId}/leave`,
+        {
+          conversationId,
+        },
+      );
+      stateConversationActive.setConversations({
+        ...stateConversationActive.conversations,
+        [conversationId]: conversation.data.encryptionKey,
       });
       onLeave();
       setIsOpen(false);

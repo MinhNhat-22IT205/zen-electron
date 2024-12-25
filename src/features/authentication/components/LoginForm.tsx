@@ -74,7 +74,6 @@ const LoginForm = () => {
       });
       return;
     }
-    console.log(otpChecker);
     const result = await login({
       email: userTemp?.email,
       password: userTemp?.password,

@@ -7,7 +7,11 @@ import { CONVERSTAION_API_ENDPOINT } from "../../api/chat-endpoints.api";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
-import { TriangleLeftIcon, GearIcon } from "@radix-ui/react-icons";
+import {
+  TriangleLeftIcon,
+  GearIcon,
+  MagnifyingGlassIcon,
+} from "@radix-ui/react-icons";
 import SearchPage from "@/src/features/search/components/SearchPage";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import http from "@/src/shared/libs/axios/axios.base";
@@ -62,18 +66,38 @@ const ConversationList = () => {
         <Text className="font-bold text-xl text-amber-800 mb-4">Messages</Text>
         <SearchPage />
       </div>
-
       <ScrollArea className="flex-1">
-        <div className="space-y-1">
-          {conversations?.map((conversation: Conversation) => (
-            <ConversationItem
-              key={conversation._id}
-              conversation={conversation}
-            />
-          ))}
-        </div>
+        {conversations?.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+            <MagnifyingGlassIcon className="w-12 h-12 text-amber-400 mb-4" />
+            <Text className="text-lg font-medium text-amber-800 mb-2">
+              No conversations yet
+            </Text>
+            <Text className="text-sm text-amber-600 mb-4">
+              Start chatting by searching for friends above!
+            </Text>
+            <Button
+              variant="outline"
+              className="border-amber-400 text-amber-700 hover:bg-amber-50"
+              onClick={() =>
+                //@ts-ignore
+                document.querySelector('input[type="search"]')?.focus()
+              }
+            >
+              Find Friends
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {conversations?.map((conversation: Conversation) => (
+              <ConversationItem
+                key={conversation._id}
+                conversation={conversation}
+              />
+            ))}
+          </div>
+        )}
       </ScrollArea>
-
       <div className="p-4 border-t border-amber-200 bg-white/80 backdrop-blur-sm">
         <Button
           onClick={() => navigate(`/user-profile/${myEndUserId}`)}
