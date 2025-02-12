@@ -4,7 +4,7 @@ const zAddGroupInputs = z.object({
   name: z.string().min(5).max(100),
   description: z.string().min(10).max(1000),
   isVisible: z.boolean().default(true),
-  image: z.instanceof(File),
+  image: z.instanceof(File).nullable(),
 });
 
 type ztAddGroupInputs = z.infer<typeof zAddGroupInputs>;

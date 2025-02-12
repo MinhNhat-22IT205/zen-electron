@@ -24,4 +24,37 @@ const createGroup = async (data: ztAddGroupInputs): Promise<Group> => {
   }
 };
 
-export { createGroup };
+const editGroup = async (
+  groupId: string,
+  data: ztAddGroupInputs,
+): Promise<Group> => {
+  try {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("isVisible", data.isVisible.toString());
+    if (data.image) {
+      formData.append("files", data.image);
+    }
+    console.log("formData", formData);
+    const response = await http.patch<Group>(
+      GROUP_API_ENDPOINT + "/" + groupId,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error.response.data);
+    throw error;
+  }
+};
+const deleteGroup = async (groupId: string): Promise<void> => {
+  const response = await http.delete<void>(GROUP_API_ENDPOINT + "/" + groupId);
+  return response.data;
+};
+
+export { createGroup, editGroup, deleteGroup };

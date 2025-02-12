@@ -6,13 +6,16 @@ import { useNavigate } from "react-router-dom";
 const FeedSearch = () => {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center w-[300px] bg-white max-w-sm space-x-2 rounded-lg border border-gray-300 dark:bg-gray-900 px-3.5 py-2">
-      <MagnifyingGlassIcon className="h-4 w-4" />
+    <div className="relative flex items-center w-[320px] group">
+      <div className="absolute left-3 pointer-events-none">
+        <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+      </div>
       <Input
         type="search"
-        placeholder="Search"
-        className="w-full border-0  h-8 font-semibold"
-        // focus:!outline-none focus-visible:!ring-0
+        placeholder="Search posts and users..."
+        className="w-full pl-10 pr-4 h-10 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl
+                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-500
+                   transition-all duration-200"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             navigate(`/search?t=user&q=${e.currentTarget.value}`);

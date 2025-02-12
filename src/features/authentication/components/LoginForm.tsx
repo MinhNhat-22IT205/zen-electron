@@ -32,11 +32,12 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (values: ztLoginInputs) => {
-    if(values.email=="admin@gmail.com"){
-        window.location.href = "https://localhost:3001/v1/api/#/";
-        return;
+    if (values.email == "admin@gmail.com") {
+      window.location.href = "https://localhost:3001/v1/api/#/";
+      return;
     }
     const result = await login(values);
+    console.log(result);
     if ("error" in result) {
       const serverError = result as unknown as ServerError;
       toast({

@@ -7,6 +7,7 @@ type EndUser = {
   description: string;
   createdAt: string;
   updatedAt: string;
+  star: number;
 };
 
 type EndUserMinimal = Pick<EndUser, "_id" | "username" | "avatar">;

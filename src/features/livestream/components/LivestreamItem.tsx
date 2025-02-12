@@ -17,15 +17,29 @@ const LivestreamItem = ({
       <ListItemWithAvatar
         avatarSrc={IMAGE_BASE_URL + livestream.endUser.avatar}
         avatarFallback={livestream.title}
-        className="border border-red-200 transition-all hover:border-red-300"
+        className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 transition-all hover:border-red-300 hover:shadow-md"
       >
         <ItemInfo>
-          <h4 className="text-sm font-semibold">{livestream.title}</h4>{" "}
-          <p className="text-sm">{livestream.description}</p>
+          <div className="flex flex-col gap-1">
+            <h4 className="text-base font-semibold tracking-tight">
+              {livestream.title}
+            </h4>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
+              {livestream.description}
+            </p>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">
+              Streaming by {livestream.endUser.username}
+            </p>
+          </div>
         </ItemInfo>
         <ItemAction>
-          <div className=" rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
-            LIVE
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-red-500 text-xs font-medium uppercase tracking-wider">
+                Live
+              </span>
+            </div>
           </div>
         </ItemAction>
       </ListItemWithAvatar>

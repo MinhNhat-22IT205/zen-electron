@@ -19,7 +19,6 @@ interface FileDisplayProps {
 }
 
 export default function FileDisplay({ filename, fileUrl }: FileDisplayProps) {
-  console.log("fileUrl", fileUrl);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

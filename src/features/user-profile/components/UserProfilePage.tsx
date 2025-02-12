@@ -15,7 +15,11 @@ import LikedPostList from "../../post/components/post-list/LikedPostList";
 import CreatedPostList from "../../post/components/post-list/CreatedPostList";
 import useFetchEndUser from "../hooks/useFetchEndUser";
 import { Button } from "@/src/shared/components/shadcn-ui/button";
-import { DotsHorizontalIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
+import {
+  DotsHorizontalIcon,
+  PaperPlaneIcon,
+  StarFilledIcon,
+} from "@radix-ui/react-icons";
 import { useAuthStore } from "@/src/shared/libs/zustand/auth.zustand";
 import { useDisclosure } from "@/src/shared/hooks/use-disclosure";
 import EditProfileDialog from "./EditProfileDialog";
@@ -26,43 +30,92 @@ const UserProfilePage = () => {
   const { id } = useParams<{ id: string }>();
   const myEndUserId = useAuthStore((state) => state.endUser?._id);
   const { endUser, isLoading } = useFetchEndUser(id);
-  if (isLoading) return <div>Loading...</div>;
-  return (
-    <div className="flex flex-col items-center p-4 w-[500px]">
-      <div
-        className={`flex items-center justify-start gap-3 w-full p-2 rounded-lg`}
-      >
-        <Avatar>
-          <AvatarImage src={IMAGE_BASE_URL + endUser?.avatar} alt="@shadcn" />
-          <AvatarFallback>{endUser.username}</AvatarFallback>
-        </Avatar>
 
-        <div className={`flex flex-col items-start justify-center gap-2`}>
-          <h3 className="text-xl font-bold">{endUser.username}</h3>
-          <p className="text-gray-500 truncate">{endUser.email}</p>
-        </div>
-        <div className="flex-1 flex justify-end">
-          <Button variant="secondary">
-            <Link
-              to={"/conversations/create-conversation?userId=" + endUser._id}
-              className="flex gap-1 items-center"
-            >
-              Message
-              <PaperPlaneIcon className="h-4 w-4 ml-2" />
-            </Link>
-          </Button>
-          {myEndUserId === endUser._id && (
-            <Button variant="ghost" onClick={open}>
-              <DotsHorizontalIcon />
-            </Button>
-          )}
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
+        <div className="flex items-center gap-6">
+          <Avatar className="h-24 w-24 ring-4 ring-blue-100 dark:ring-blue-900">
+            <AvatarImage
+              src={IMAGE_BASE_URL + endUser?.avatar}
+              alt={endUser.username}
+              className="object-cover"
+            />
+            <AvatarFallback className="text-2xl bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-100">
+              {endUser.username.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex-1">
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                  {endUser.username}
+                </h1>
+                <p className="text-gray-500 dark:text-gray-400 mb-2">
+                  {endUser.email}
+                </p>
+                <div className="flex items-center text-yellow-500 dark:text-yellow-400">
+                  <span className="font-semibold mr-1">
+                    {endUser?.star ?? 0}
+                  </span>
+                  <StarFilledIcon className="w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="default"
+                  className="bg-blue-500 hover:bg-blue-600 text-white shadow-md"
+                  asChild
+                >
+                  <Link
+                    to={
+                      "/conversations/create-conversation?userId=" + endUser._id
+                    }
+                    className="flex items-center gap-2"
+                  >
+                    Message
+                    <PaperPlaneIcon className="h-4 w-4" />
+                  </Link>
+                </Button>
+                {myEndUserId === endUser._id && (
+                  <Button
+                    variant="outline"
+                    onClick={open}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <DotsHorizontalIcon className="h-5 w-5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {endUser.description && (
+              <p className="mt-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                {endUser.description}
+              </p>
+            )}
+          </div>
         </div>
       </div>
-      <p className="px-4 text-left mr-auto">{endUser.description}</p>
+
       <Tabs defaultValue="posts" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="posts">User posts</TabsTrigger>
-          <TabsTrigger value="liked">Liked posts</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsTrigger value="posts" className="text-sm font-medium">
+            User Posts
+          </TabsTrigger>
+          <TabsTrigger value="liked" className="text-sm font-medium">
+            Liked Posts
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="posts">
           <CreatedPostList />
@@ -71,6 +124,7 @@ const UserProfilePage = () => {
           <LikedPostList />
         </TabsContent>
       </Tabs>
+
       <EditProfileDialog
         isOpen={isOpen}
         onChange={(isOpen) => {

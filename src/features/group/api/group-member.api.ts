@@ -33,4 +33,11 @@ const deleteGroupMember = async (
   }, deleteGroupMemberOptions(endUserId));
 };
 
-export { deleteGroupMember };
+const leaveGroupApi = async (groupId: string) => {
+  console.log("leaveGroupApi", groupId);
+  const response = await http.delete(
+    `${GROUP_MEMBER_API_ENDPOINT}/leave-group/${groupId}`,
+  );
+};
+
+export { deleteGroupMember, leaveGroupApi };

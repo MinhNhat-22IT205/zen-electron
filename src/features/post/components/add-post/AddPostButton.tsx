@@ -8,8 +8,13 @@ const AddPostButton = () => {
   const { isOpen, open, close } = useDisclosure();
   return (
     <>
-      <Button className="bg-blue-600 text-white" onClick={open}>
-        <PlusIcon className="w-5 h-5" />
+      <Button
+        className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all duration-200 
+                   shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 
+                   dark:shadow-blue-500/10 dark:hover:shadow-blue-500/20"
+        onClick={open}
+      >
+        <PlusIcon className="w-5 h-5 mr-2" />
         Add Post
       </Button>
       <AddPostDialog

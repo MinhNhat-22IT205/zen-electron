@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useParams, useSearchParams } from "react-router-dom";
 import { GroupMember } from "@/src/shared/types/group.type";
@@ -15,15 +15,20 @@ const GroupMemberList = () => {
   const [searchParams] = useSearchParams();
   const isOwner = (searchParams.get("isOwner") ?? "false") === "true";
   const endUserId = useAuthStore((state) => state.endUser?._id);
-  const {
-    data: groupMembers,
-    isLoading,
-    mutate,
-    error,
-  } = useSWR<GroupMember[]>(
+  const { data, isLoading, mutate, error } = useSWR<GroupMember[]>(
     `${GROUP_MEMBER_API_ENDPOINT}/${groupId}?limit=1000&skip=0`,
     fetcher,
   );
+  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
+  useEffect(() => {
+    //remove duplicate group members
+    const uniqueGroupMembers = data?.filter(
+      (groupMember, index, self) =>
+        index ===
+        self.findIndex((t) => t.endUser._id === groupMember.endUser._id),
+    );
+    setGroupMembers(uniqueGroupMembers);
+  }, [data]);
 
   if (isLoading) return <h1>Loading...</h1>;
   if (error) return <h1>{error.message}</h1>;

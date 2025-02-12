@@ -6,6 +6,9 @@ import { io, Socket } from "socket.io-client";
 import useStreamRecord, { DownloadData } from "./useStreamRecord";
 import useScreenShare from "./useScreenShare";
 import { SERVER_SOCKET_URL } from "@/src/shared/libs/socketio/client-socket.base";
+import useStreamQuestion from "./useStreamQuestion";
+import { Question } from "@/src/shared/types/question.type";
+import { useQuestionStore } from "@/src/shared/libs/zustand/question.zustand";
 
 const ICE_SERVERS = {
   iceServers: [
@@ -42,6 +45,7 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
   const { id: liveStreamId } = useParams();
   const myEndUser = useAuthStore((state) => state.endUser);
   const { socket: clientSocket, setSocket } = useSocketStore();
+  const questionStore = useQuestionStore();
   const {
     startStreamRecord,
     isRecording,
@@ -120,13 +124,19 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
     clientSocket.off("memberLeft");
     clientSocket.off("callMessageFromPeer");
     clientSocket.off("stopLiveStream");
+    clientSocket.off("addQuestion");
+    clientSocket.off("questionChoice");
   };
 
   const setupSocketListeners = () => {
+    removeSocketListeners();
+
     clientSocket.on("userJoin", handleUserJoin);
     clientSocket.on("memberLeft", handleUserLeft);
     clientSocket.on("callMessageFromPeer", handleMessageFromPeer);
     clientSocket.on("stopLiveStream", handleStopLiveStream);
+    clientSocket.on("addQuestion", handleAddQuestion);
+    clientSocket.on("questionChoice", handleQuestionChoice);
   };
 
   const handleUserJoin = ({ fromEndUserId }: { fromEndUserId: string }) => {
@@ -168,6 +178,23 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
         await handleIceCandidate(fromEndUserId, data);
         break;
     }
+  };
+
+  const handleAddQuestion = ({ question }: { question: Question }) => {
+    console.log("handleAddQuestion", question);
+    if (isHost) return;
+    questionStore.addQuestion(question);
+  };
+
+  const handleQuestionChoice = ({
+    questionId,
+    choice,
+  }: {
+    questionId: string;
+    choice: string;
+  }) => {
+    console.log("handleQuestionChoice", questionId, choice);
+    questionStore.addChoiceCount(questionId, choice);
   };
 
   const emitInitialRequest = () => {
@@ -373,6 +400,7 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
       });
       navigate(`/feeds`);
     }
+    questionStore.resetQuestions();
   };
 
   const toggleTrack = (kind: "video" | "audio") => {
@@ -404,13 +432,22 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
     if (recording) recording.stop();
   };
 
-  // const toggleShareScreenA = async () => {
-  //   const newStream = await toggleShareScreen(
-  //     Object.values(peerConnectionsRef.current),
-  //   );
-  //   localStreamRef.current = newStream;
-  //   console.log("localStreamC", localStreamRef.current);
-  // };
+  const addQuestion = (question: Question) => {
+    questionStore.addQuestion(question);
+    clientSocket.emit("addQuestion", {
+      liveStreamId,
+      question,
+    });
+  };
+
+  const emitQuestionChoice = (questionId: string, choice: string) => {
+    clientSocket.emit("questionChoice", {
+      liveStreamId,
+      questionId,
+      choice,
+    });
+  };
+
   const startScreenShareModified = async (selectedScreenSourceId: string) => {
     const newStream = await startScreenShare(
       Object.values(peerConnectionsRef.current),
@@ -439,6 +476,9 @@ const useStreamSocket = ({ isHost }: { isHost: boolean }) => {
     stopScreenShare: stopScreenShareModified,
     getScreenShareSources,
     isSharingScreen,
+    questionStore,
+    addQuestion,
+    emitQuestionChoice,
   };
 };
 

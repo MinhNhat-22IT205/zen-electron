@@ -5,12 +5,11 @@ import { ENDUSER_SEARCH_API_ENDPOINT } from "../api/search-endpoints.api";
 import { fetcher } from "@/src/shared/libs/swr/fetcher";
 import { EndUser } from "@/src/shared/types/enduser.type";
 import EnduserSearchItem from "./EnduserSearchItem";
+import { useSearchParams } from "react-router-dom";
 
-type EnduserSearchListProps = {
-  searchQuery: string;
-};
-
-const EnduserSearchList = ({ searchQuery }: EnduserSearchListProps) => {
+const EnduserSearchList = () => {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("q");
   const {
     data: endUsers,
     isLoading,

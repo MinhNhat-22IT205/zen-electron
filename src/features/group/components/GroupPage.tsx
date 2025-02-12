@@ -17,17 +17,27 @@ const GroupPage = () => {
         <CreateGroupDialog />
       </div>
       <Tabs defaultValue="discovery" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="discovery">Discovery</TabsTrigger>
-          <TabsTrigger value="your-groups">Your Groups</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 mb-6 rounded-xl bg-gray-100 dark:bg-gray-800 p-1">
+          <TabsTrigger
+            value="discovery"
+            className="rounded-lg py-3 text-sm font-medium transition-all"
+          >
+            Discover
+          </TabsTrigger>
+          <TabsTrigger
+            value="your-groups"
+            className="rounded-lg py-3 text-sm font-medium transition-all"
+          >
+            Your Groups
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="discovery">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <TabsContent value="discovery" className="mt-4">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <DiscoveryGroupList />
           </div>
         </TabsContent>
-        <TabsContent value="your-groups">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <TabsContent value="your-groups" className="mt-4">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <YourGroupList />
           </div>
         </TabsContent>

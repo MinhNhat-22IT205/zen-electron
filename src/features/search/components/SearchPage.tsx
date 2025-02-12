@@ -45,7 +45,7 @@ const SearchPage = () => {
             <TabsTrigger value="feed">feed</TabsTrigger>
           </TabsList>
           <TabsContent value="user">
-            <EnduserSearchList searchQuery={searchQuery} />
+            <EnduserSearchList />
           </TabsContent>
           <TabsContent value="feed">
             <FeedSearchList />

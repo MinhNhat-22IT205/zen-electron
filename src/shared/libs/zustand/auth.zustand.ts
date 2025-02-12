@@ -15,6 +15,7 @@ const useAuthStore = create<AuthStore>()(
       password: "",
       avatar: "",
       description: "",
+      star: 0,
       createdAt: "",
       updatedAt: "",
     },
